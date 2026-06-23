@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Hammond Homestead</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="announcement-bar">Free shipping on orders over $50 &nbsp;·&nbsp; Handmade in St. Peters, MO</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-ring"><img src="images/logo.png" alt="HH" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none;">HH</span></div>
+      <div class="header-logo-text">Hammond Homestead<small>Hustle &amp; Motivation Makes Our Next Dream</small></div>
+    </a>
+    <nav class="header-nav">
+      <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="story.html">Our Story</a><a href="contact.html" class="active">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count" style="display:none;">0</span></button>
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="story.html">Our Story</a><a href="contact.html">Contact</a>
+  </div>
+</header>
+
+<div class="page-header">
+  <h1>Get in Touch</h1>
+  <p>We'd love to hear from you</p>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-info">
+        <h2>Say Hello</h2>
+        <p>Have a question about an order, a custom request, or just want to say hi? Reach out — we read and respond to every message.</p>
+        <p>We typically respond within 1–2 business days.</p>
+        <div class="contact-detail">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+          hello@hammond-homestead.com
+        </div>
+        <div class="contact-detail">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          St. Peters, Missouri
+        </div>
+      </div>
+
+      <div>
+        <form id="contact-form">
+          <div class="field-row">
+            <div class="field"><label>First Name</label><input type="text" id="c-fname" placeholder="Jane" required></div>
+            <div class="field"><label>Last Name</label><input type="text" id="c-lname" placeholder="Hammond" required></div>
+          </div>
+          <div class="field"><label>Email</label><input type="email" id="c-email" placeholder="jane@email.com" required></div>
+          <div class="field"><label>Subject</label><input type="text" id="c-subject" placeholder="Order question, custom request..."></div>
+          <div class="field"><label>Message</label><textarea id="c-message" placeholder="Tell us what's on your mind..." required></textarea></div>
+          <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+          <p id="contact-msg" style="margin-top:0.75rem;font-size:0.85rem;text-align:center;min-height:1.2em;"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="cart-overlay" id="cart-overlay"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-drawer-header"><h3>Your Cart</h3><button class="cart-close" onclick="closeCart()">✕</button></div>
+  <div class="cart-items" id="cart-items"><div class="cart-empty" id="cart-empty">Your cart is empty.</div></div>
+  <div class="cart-footer hidden" id="cart-footer">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+    <a href="checkout.html" class="btn btn-primary btn-full">Checkout →</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col"><h4>Hammond Homestead</h4><p>Handmade goods crafted with hustle and heart from St. Peters, Missouri.</p></div>
+    <div class="footer-col"><h4>Shop</h4><a href="shop.html">All Products</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="story.html">Our Story</a><a href="contact.html">Contact</a></div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-slogan">"Hustle and Motivation Makes Our Next Dream"</p>
+    <p class="footer-copy">© 2026 Hammond Homestead · All rights reserved</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+  document.getElementById('contact-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    const msg = document.getElementById('contact-msg');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    // In production connect to an email service like Resend or Formspree
+    // For now simulate a success
+    await new Promise(r => setTimeout(r, 1000));
+    msg.textContent = "Message sent! We'll get back to you within 1–2 business days.";
+    msg.style.color = '#27AE60';
+    this.reset();
+    btn.disabled = false;
+    btn.textContent = 'Send Message';
+  });
+</script>
+</body>
+</html>

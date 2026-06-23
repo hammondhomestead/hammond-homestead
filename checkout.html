@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Hammond Homestead</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-ring">
+        <img src="images/logo.png" alt="HH" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span style="display:none;">HH</span>
+      </div>
+      <div class="header-logo-text">Hammond Homestead<small>Hustle &amp; Motivation Makes Our Next Dream</small></div>
+    </a>
+    <div class="header-actions">
+      <span style="color:#B8A898;font-size:0.82rem;font-family:Arial,sans-serif;">
+        🔒 Secure Checkout
+      </span>
+    </div>
+  </div>
+</header>
+
+<section class="checkout-page">
+  <div class="container">
+    <div class="checkout-layout">
+
+      <!-- ORDER SUMMARY -->
+      <div>
+        <div class="checkout-summary">
+          <h3>Order Summary</h3>
+          <div id="checkout-lines"></div>
+          <div class="checkout-line muted" id="checkout-shipping-line">
+            <span>Shipping</span><span id="checkout-shipping">Calculated at next step</span>
+          </div>
+          <div class="checkout-total">
+            <span>Total</span>
+            <span id="checkout-total">$0.00</span>
+          </div>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <div class="payment-divider">Pay with PayPal</div>
+          <div id="paypal-button-container"></div>
+        </div>
+      </div>
+
+      <!-- CHECKOUT FORM -->
+      <div class="checkout-form">
+        <h2>Your Details</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label>First Name</label>
+            <input type="text" id="first-name" placeholder="Jane" required>
+            <div class="field-error">Required</div>
+          </div>
+          <div class="field">
+            <label>Last Name</label>
+            <input type="text" id="last-name" placeholder="Hammond" required>
+            <div class="field-error">Required</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="jane@email.com" required>
+          <div class="field-error">Valid email required</div>
+        </div>
+
+        <div class="field">
+          <label>Street Address</label>
+          <input type="text" id="address" placeholder="123 Homestead Rd" required>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>City</label>
+            <input type="text" id="city" placeholder="St. Peters" required>
+          </div>
+          <div class="field">
+            <label>State</label>
+            <input type="text" id="state" placeholder="MO" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>ZIP Code</label>
+            <input type="text" id="zip" placeholder="63376" required>
+          </div>
+          <div class="field">
+            <label>Country</label>
+            <input type="text" id="country" value="United States" required>
+          </div>
+        </div>
+
+        <div class="payment-divider">Card Payment</div>
+
+        <div class="field">
+          <label>Card Details</label>
+          <div id="card-element"></div>
+          <div id="card-errors"></div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="place-order-btn" onclick="placeOrder()">
+          Place Order →
+        </button>
+
+        <p class="secure-note">
+          🔒 Secured by Stripe &nbsp;·&nbsp; SSL Encrypted &nbsp;·&nbsp; We never store card details
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-bottom" style="margin:0;padding:1rem 1.5rem;">
+    <p class="footer-copy">© 2026 Hammond Homestead · hammond-homestead.com</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+<script>
+  // ── RENDER ORDER SUMMARY ──
+  function renderSummary() {
+    const lines = document.getElementById('checkout-lines');
+    const totalEl = document.getElementById('checkout-total');
+    if (!lines || cart.length === 0) {
+      lines.innerHTML = '<p style="color:#7A6A58;font-size:0.85rem;">Your cart is empty.</p>';
+      return;
+    }
+
+    const shipping = cartTotal() >= 50 ? 0 : 5.99;
+    const total = cartTotal() + shipping;
+
+    lines.innerHTML = cart.map(item => `
+      <div class="checkout-line">
+        <span>${item.name} × ${item.qty}</span>
+        <span>$${(item.price * item.qty).toFixed(2)}</span>
+      </div>
+    `).join('');
+
+    const shippingEl = document.getElementById('checkout-shipping');
+    if (shippingEl) shippingEl.textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
+    if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+  }
+
+  // ── STRIPE ──
+  const stripe = Stripe(STRIPE_KEY);
+  const elements = stripe.elements();
+  const cardElement = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '16px',
+        color: '#2A1A0A',
+        fontFamily: 'Arial, sans-serif',
+        '::placeholder': { color: '#B8A898' }
+      },
+      invalid: { color: '#C0392B' }
+    }
+  });
+  cardElement.mount('#card-element');
+  cardElement.on('change', (e) => {
+    document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+  });
+
+  async function placeOrder() {
+    const btn = document.getElementById('place-order-btn');
+    const firstName = document.getElementById('first-name').value.trim();
+    const lastName = document.getElementById('last-name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const zip = document.getElementById('zip').value.trim();
+
+    if (!firstName || !lastName || !email || !address || !city || !state || !zip) {
+      showToast('Please fill in all required fields.', 'error');
+      return;
+    }
+    if (cart.length === 0) {
+      showToast('Your cart is empty.', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Processing...';
+
+    try {
+      const shipping = cartTotal() >= 50 ? 0 : 5.99;
+      const total = Math.round((cartTotal() + shipping) * 100);
+
+      // Create payment intent via Supabase Edge Function
+      const intentRes = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          amount: total,
+          currency: 'usd',
+          customer_email: email,
+          items: cart
+        })
+      });
+
+      if (!intentRes.ok) throw new Error('Payment setup failed');
+      const { client_secret } = await intentRes.json();
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: `${firstName} ${lastName}`,
+            email,
+            address: { line1: address, city, state, postal_code: zip, country: 'US' }
+          }
+        }
+      });
+
+      if (error) throw new Error(error.message);
+
+      // Save order to Supabase
+      await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          payment_intent_id: paymentIntent.id,
+          customer_name: `${firstName} ${lastName}`,
+          customer_email: email,
+          address: `${address}, ${city}, ${state} ${zip}`,
+          items: cart,
+          subtotal: cartTotal(),
+          shipping,
+          total: cartTotal() + shipping,
+          status: 'paid'
+        })
+      });
+
+      // Clear cart and redirect
+      cart = [];
+      saveCart();
+      localStorage.setItem('hh_last_order', JSON.stringify({
+        name: `${firstName} ${lastName}`,
+        email,
+        total: (cartTotal() + shipping).toFixed(2),
+        id: paymentIntent.id.slice(-8).toUpperCase()
+      }));
+      window.location.href = 'confirmation.html';
+
+    } catch (err) {
+      document.getElementById('card-errors').textContent = err.message;
+      showToast(err.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'Place Order →';
+    }
+  }
+
+  // ── PAYPAL ──
+  paypal.Buttons({
+    createOrder(data, actions) {
+      const shipping = cartTotal() >= 50 ? 0 : 5.99;
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: (cartTotal() + shipping).toFixed(2),
+            breakdown: {
+              item_total: { currency_code: 'USD', value: cartTotal().toFixed(2) },
+              shipping: { currency_code: 'USD', value: shipping.toFixed(2) }
+            }
+          },
+          items: cart.map(item => ({
+            name: item.name,
+            unit_amount: { currency_code: 'USD', value: parseFloat(item.price).toFixed(2) },
+            quantity: item.qty
+          }))
+        }]
+      });
+    },
+    async onApprove(data, actions) {
+      const order = await actions.order.capture();
+      const shipping = cartTotal() >= 50 ? 0 : 5.99;
+
+      // Save PayPal order to Supabase
+      await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          payment_intent_id: order.id,
+          customer_name: order.payer.name.given_name + ' ' + order.payer.name.surname,
+          customer_email: order.payer.email_address,
+          address: '',
+          items: cart,
+          subtotal: cartTotal(),
+          shipping,
+          total: cartTotal() + shipping,
+          status: 'paid',
+          payment_method: 'paypal'
+        })
+      });
+
+      localStorage.setItem('hh_last_order', JSON.stringify({
+        name: order.payer.name.given_name + ' ' + order.payer.name.surname,
+        email: order.payer.email_address,
+        total: (cartTotal() + shipping).toFixed(2),
+        id: order.id.slice(-8).toUpperCase()
+      }));
+
+      cart = [];
+      saveCart();
+      window.location.href = 'confirmation.html';
+    },
+    onError(err) {
+      showToast('PayPal error. Please try again or pay by card.', 'error');
+    }
+  }).render('#paypal-button-container');
+
+  // Init
+  renderSummary();
+</script>
+</body>
+</html>

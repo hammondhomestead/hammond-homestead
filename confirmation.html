@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed — Hammond Homestead</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-ring"><span>HH</span></div>
+      <div class="header-logo-text">Hammond Homestead</div>
+    </a>
+  </div>
+</header>
+
+<div class="confirmation-page">
+  <div class="confirmation-icon">✅</div>
+  <h1>Order Placed!</h1>
+  <p id="confirmation-sub">Thank you for your order. You'll receive a confirmation email shortly.</p>
+
+  <div class="confirmation-order" id="order-details"></div>
+
+  <a href="shop.html" class="btn btn-primary">Continue Shopping</a>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-bottom" style="margin:0;padding:1rem 1.5rem;">
+    <p class="footer-copy">© 2026 Hammond Homestead · hammond-homestead.com</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script>
+  const order = JSON.parse(localStorage.getItem('hh_last_order') || '{}');
+  if (order.name) {
+    document.getElementById('confirmation-sub').textContent =
+      `Thank you, ${order.name}! A confirmation will be sent to ${order.email}.`;
+    document.getElementById('order-details').innerHTML = `
+      <h3>Order Details</h3>
+      <div class="checkout-line"><span>Order #</span><span>${order.id || 'N/A'}</span></div>
+      <div class="checkout-line"><span>Total Paid</span><span>$${order.total}</span></div>
+    `;
+    localStorage.removeItem('hh_last_order');
+  }
+</script>
+</body>
+</html>
