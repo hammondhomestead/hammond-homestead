@@ -5,7 +5,7 @@
 // ── SUPABASE CONFIG ──
 // Replace these with your actual Supabase credentials from supabase.com
 const SUPABASE_URL = 'https://mirprmehihimttgxdcvq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_eYgxk4-ygfHs-0FNF2RPdg_T2tJFEdO';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pcnBybWVoaWhpbXR0Z3hkY3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNzgyNzgsImV4cCI6MjA5Nzc1NDI3OH0.GKnX_tksrjKPS-Jyu7n7J1zT7jYIX5vvypP7jUkgczM';
 
 // ── STRIPE CONFIG ──
 // Replace with your Stripe publishable key from stripe.com/dashboard
