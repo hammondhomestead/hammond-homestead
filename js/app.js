@@ -4,8 +4,8 @@
 
 // ── SUPABASE CONFIG ──
 // Replace these with your actual Supabase credentials from supabase.com
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://mirprmehihimttgxdcvq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_eYgxk4-ygfHs-0FNF2RPdg_T2tJFEdO';
 
 // ── STRIPE CONFIG ──
 // Replace with your Stripe publishable key from stripe.com/dashboard
@@ -172,7 +172,7 @@ function buildProductCard(p) {
         <div class="product-card-footer">
           <div class="product-card-price">$${parseFloat(p.price).toFixed(2)}</div>
           <button class="btn btn-dark btn-sm"
-            onclick="addToCart({id:'${p.id}',name:'${p.name.replace(/'/g,"\\'")}',price:${p.price},image:'${p.image_url || ''}'})">
+            onclick="trackRecentlyViewed({id:'${p.id}',name:'${p.name}',price:${p.price},image:'${p.image_url||""}'});addToCart({id:'${p.id}',name:'${p.name.replace(/'/g,\"\\\'\")}'.replace(/undefined/,''),price:${p.price},image:'${p.image_url||""}'})>
             Add to Cart
           </button>
         </div>
