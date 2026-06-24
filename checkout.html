@@ -18,9 +18,7 @@
       <div class="header-logo-text">Hammond Homestead<small>Hustle &amp; Motivation Makes Our Next Dream</small></div>
     </a>
     <div class="header-actions">
-      <span style="color:#B8A898;font-size:0.82rem;font-family:Arial,sans-serif;">
-        🔒 Secure Checkout
-      </span>
+      <span style="color:#B8A898;font-size:.82rem;font-family:Arial,sans-serif;">🔒 Secure Checkout</span>
     </div>
   </div>
 </header>
@@ -34,9 +32,26 @@
         <div class="checkout-summary">
           <h3>Order Summary</h3>
           <div id="checkout-lines"></div>
+
+          <!-- PROMO CODE -->
+          <div style="margin:1rem 0;padding:1rem 0;border-top:1px solid #E8DDD0;border-bottom:1px solid #E8DDD0;">
+            <div style="display:flex;gap:.5rem;">
+              <input type="text" id="promo-input" placeholder="Promo code"
+                style="flex:1;padding:.55rem .85rem;border:1px solid #E8DDD0;border-radius:3px;font-size:.875rem;font-family:Arial,sans-serif;text-transform:uppercase;"
+                oninput="this.value=this.value.toUpperCase()"
+                onkeydown="if(event.key==='Enter')applyPromo()">
+              <button class="btn btn-outline btn-sm" onclick="applyPromo()" id="promo-btn">Apply</button>
+            </div>
+            <p id="promo-msg" style="font-size:.8rem;margin-top:.4rem;min-height:1.2em;font-family:Arial,sans-serif;"></p>
+          </div>
+
+          <div class="checkout-line muted" id="checkout-discount-line" style="display:none;">
+            <span id="checkout-discount-label">Discount</span>
+            <span id="checkout-discount-amount" style="color:#27AE60;">-$0.00</span>
+          </div>
           <div class="checkout-line muted">
             <span>Shipping</span>
-            <span id="checkout-shipping">Calculated below</span>
+            <span id="checkout-shipping">Calculating...</span>
           </div>
           <div class="checkout-total">
             <span>Total</span>
@@ -56,60 +71,32 @@
       <!-- SHIPPING DETAILS -->
       <div class="checkout-form">
         <h2>Your Details</h2>
-        <p style="font-size:0.85rem;color:#7A6A58;margin-bottom:1.5rem;font-family:Arial,sans-serif;">
+        <p style="font-size:.85rem;color:#7A6A58;margin-bottom:1.5rem;font-family:Arial,sans-serif;">
           Fill in your shipping details below then click the PayPal button to complete your order.
         </p>
 
         <div class="field-row">
-          <div class="field">
-            <label>First Name</label>
-            <input type="text" id="first-name" placeholder="Jane" required>
-          </div>
-          <div class="field">
-            <label>Last Name</label>
-            <input type="text" id="last-name" placeholder="Hammond" required>
-          </div>
+          <div class="field"><label>First Name</label><input type="text" id="first-name" placeholder="Jane" required></div>
+          <div class="field"><label>Last Name</label><input type="text" id="last-name" placeholder="Hammond" required></div>
         </div>
-
-        <div class="field">
-          <label>Email Address</label>
-          <input type="email" id="email" placeholder="jane@email.com" required>
-        </div>
-
-        <div class="field">
-          <label>Street Address</label>
-          <input type="text" id="address" placeholder="123 Homestead Rd" required>
-        </div>
-
+        <div class="field"><label>Email Address</label><input type="email" id="email" placeholder="jane@email.com" required></div>
+        <div class="field"><label>Street Address</label><input type="text" id="address" placeholder="123 Homestead Rd" required></div>
         <div class="field-row">
-          <div class="field">
-            <label>City</label>
-            <input type="text" id="city" placeholder="Nashville" required>
-          </div>
-          <div class="field">
-            <label>State</label>
-            <input type="text" id="state" placeholder="MI" required>
-          </div>
+          <div class="field"><label>City</label><input type="text" id="city" placeholder="Nashville" required></div>
+          <div class="field"><label>State</label><input type="text" id="state" placeholder="MI" required></div>
         </div>
-
         <div class="field-row">
-          <div class="field">
-            <label>ZIP Code</label>
-            <input type="text" id="zip" placeholder="49073" required>
-          </div>
-          <div class="field">
-            <label>Country</label>
-            <input type="text" id="country" value="United States">
-          </div>
+          <div class="field"><label>ZIP Code</label><input type="text" id="zip" placeholder="49073" required></div>
+          <div class="field"><label>Country</label><input type="text" id="country" value="United States"></div>
         </div>
 
-        <div style="background:#F2EBE0;border:0.5px solid #E8DDD0;border-radius:6px;padding:1rem;margin-top:0.5rem;">
-          <p style="font-size:0.82rem;color:#7A6A58;font-family:Arial,sans-serif;margin:0;line-height:1.6;">
-            👆 Fill in your details above, then click the <strong>PayPal button on the left</strong> to complete your purchase securely. You can pay with your PayPal balance or any credit/debit card through PayPal.
+        <div style="background:#F2EBE0;border:.5px solid #E8DDD0;border-radius:6px;padding:1rem;margin-top:.5rem;">
+          <p style="font-size:.82rem;color:#7A6A58;font-family:Arial,sans-serif;margin:0;line-height:1.6;">
+            👆 Fill in your details above, then click the <strong>PayPal button on the left</strong> to complete your purchase securely.
           </p>
         </div>
-
       </div>
+
     </div>
   </div>
 </section>
@@ -123,20 +110,121 @@
 <script src="js/app.js"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
 <script>
+  let appliedPromo = null;
 
-  // ── RENDER ORDER SUMMARY ──
+  /* ── PROMO CODE ── */
+  async function applyPromo() {
+    const code = document.getElementById('promo-input').value.trim().toUpperCase();
+    const msg = document.getElementById('promo-msg');
+    const btn = document.getElementById('promo-btn');
+
+    if (!code) { msg.textContent = 'Please enter a promo code.'; msg.style.color = '#C0392B'; return; }
+
+    btn.disabled = true;
+    btn.textContent = '...';
+    msg.textContent = '';
+
+    try {
+      const res = await fetch(
+        SUPABASE_URL + '/rest/v1/promo_codes?code=eq.' + encodeURIComponent(code) + '&select=*',
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        msg.textContent = '✗ Invalid promo code.';
+        msg.style.color = '#C0392B';
+        return;
+      }
+
+      const promo = data[0];
+
+      // Check active
+      if (!promo.active) {
+        msg.textContent = '✗ This promo code is no longer active.';
+        msg.style.color = '#C0392B'; return;
+      }
+
+      // Check expiry
+      if (promo.expires_at && new Date(promo.expires_at) < new Date()) {
+        msg.textContent = '✗ This promo code has expired.';
+        msg.style.color = '#C0392B'; return;
+      }
+
+      // Check max uses
+      if (promo.max_uses && promo.uses >= promo.max_uses) {
+        msg.textContent = '✗ This promo code has reached its usage limit.';
+        msg.style.color = '#C0392B'; return;
+      }
+
+      // Check min order
+      if (promo.min_order && cartTotal() < promo.min_order) {
+        msg.textContent = `✗ This code requires a minimum order of $${parseFloat(promo.min_order).toFixed(2)}.`;
+        msg.style.color = '#C0392B'; return;
+      }
+
+      // Valid!
+      appliedPromo = promo;
+      const discount = calcDiscount();
+      const label = promo.type === 'percent'
+        ? promo.amount + '% off'
+        : '$' + parseFloat(promo.amount).toFixed(2) + ' off';
+
+      msg.textContent = '✓ Code applied — ' + label + '!';
+      msg.style.color = '#27AE60';
+      btn.textContent = 'Remove';
+      btn.onclick = removePromo;
+      renderSummary();
+
+    } catch (err) {
+      msg.textContent = '✗ Could not verify code. Please try again.';
+      msg.style.color = '#C0392B';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function removePromo() {
+    appliedPromo = null;
+    document.getElementById('promo-input').value = '';
+    document.getElementById('promo-msg').textContent = '';
+    document.getElementById('promo-btn').textContent = 'Apply';
+    document.getElementById('promo-btn').onclick = applyPromo;
+    document.getElementById('checkout-discount-line').style.display = 'none';
+    renderSummary();
+  }
+
+  function calcDiscount() {
+    if (!appliedPromo) return 0;
+    if (appliedPromo.type === 'percent') {
+      return Math.min(cartTotal() * (appliedPromo.amount / 100), cartTotal());
+    }
+    return Math.min(parseFloat(appliedPromo.amount), cartTotal());
+  }
+
+  function getShippingCost() {
+    const threshold = parseFloat(localStorage.getItem('hh_free_shipping_threshold') || '50');
+    const cost = parseFloat(localStorage.getItem('hh_shipping_cost') || '5.99');
+    return cartTotal() >= threshold ? 0 : cost;
+  }
+
+  function getFinalTotal() {
+    return Math.max(0, cartTotal() - calcDiscount() + getShippingCost());
+  }
+
+  /* ── RENDER SUMMARY ── */
   function renderSummary() {
     const lines = document.getElementById('checkout-lines');
     const totalEl = document.getElementById('checkout-total');
     const shippingEl = document.getElementById('checkout-shipping');
+    const discountLine = document.getElementById('checkout-discount-line');
+    const discountLabel = document.getElementById('checkout-discount-label');
+    const discountAmount = document.getElementById('checkout-discount-amount');
 
     if (!lines || cart.length === 0) {
-      lines.innerHTML = '<p style="color:#7A6A58;font-size:0.85rem;font-family:Arial,sans-serif;">Your cart is empty. <a href="shop.html" style="color:#8A7A65;">Go to shop →</a></p>';
+      lines.innerHTML = '<p style="color:#7A6A58;font-size:.85rem;font-family:Arial,sans-serif;">Your cart is empty. <a href="shop.html" style="color:#8A7A65;">Go to shop →</a></p>';
       return;
     }
-
-    const shipping = cartTotal() >= 50 ? 0 : 5.99;
-    const total = cartTotal() + shipping;
 
     lines.innerHTML = cart.map(item => `
       <div class="checkout-line">
@@ -145,53 +233,80 @@
       </div>
     `).join('');
 
+    const shipping = getShippingCost();
+    const discount = calcDiscount();
+    const threshold = parseFloat(localStorage.getItem('hh_free_shipping_threshold') || '50');
+
     if (shippingEl) shippingEl.textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
-    if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+
+    if (discount > 0 && appliedPromo) {
+      discountLine.style.display = 'flex';
+      const label = appliedPromo.type === 'percent'
+        ? `${appliedPromo.code} (${appliedPromo.amount}% off)`
+        : `${appliedPromo.code} ($${parseFloat(appliedPromo.amount).toFixed(2)} off)`;
+      discountLabel.textContent = label;
+      discountAmount.textContent = `-$${discount.toFixed(2)}`;
+    } else {
+      discountLine.style.display = 'none';
+    }
+
+    if (totalEl) totalEl.textContent = `$${getFinalTotal().toFixed(2)}`;
   }
 
-  // ── VALIDATE FORM ──
+  /* ── VALIDATE FORM ── */
   function validateForm() {
-    const firstName = document.getElementById('first-name').value.trim();
-    const lastName = document.getElementById('last-name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const address = document.getElementById('address').value.trim();
-    const city = document.getElementById('city').value.trim();
-    const state = document.getElementById('state').value.trim();
-    const zip = document.getElementById('zip').value.trim();
-
-    if (!firstName || !lastName || !email || !address || !city || !state || !zip) {
-      showToast('Please fill in all your details before paying.', 'error');
-      return false;
+    const fields = ['first-name','last-name','email','address','city','state','zip'];
+    for (const id of fields) {
+      if (!document.getElementById(id).value.trim()) {
+        showToast('Please fill in all your details before paying.', 'error');
+        document.getElementById(id).focus();
+        return false;
+      }
     }
-    if (cart.length === 0) {
-      showToast('Your cart is empty.', 'error');
-      return false;
-    }
+    if (cart.length === 0) { showToast('Your cart is empty.', 'error'); return false; }
     return true;
   }
 
-  // ── PAYPAL ──
+  /* ── INCREMENT PROMO USES ── */
+  async function incrementPromoUses() {
+    if (!appliedPromo) return;
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/promo_codes?id=eq.' + appliedPromo.id, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
+        },
+        body: JSON.stringify({ uses: (appliedPromo.uses || 0) + 1 })
+      });
+    } catch (err) {
+      console.log('Could not update promo uses:', err);
+    }
+  }
+
+  /* ── PAYPAL ── */
   paypal.Buttons({
-    style: {
-      layout: 'vertical',
-      color: 'gold',
-      shape: 'rect',
-      label: 'paypal'
-    },
+    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
 
     onClick() {
       if (!validateForm()) return false;
     },
 
     createOrder(data, actions) {
-      const shipping = cartTotal() >= 50 ? 0 : 5.99;
+      const shipping = getShippingCost();
+      const discount = calcDiscount();
+      const subtotal = cartTotal();
+      const total = getFinalTotal();
+
       return actions.order.create({
         purchase_units: [{
           amount: {
-            value: (cartTotal() + shipping).toFixed(2),
+            value: total.toFixed(2),
             breakdown: {
-              item_total: { currency_code: 'USD', value: cartTotal().toFixed(2) },
-              shipping: { currency_code: 'USD', value: shipping.toFixed(2) }
+              item_total: { currency_code: 'USD', value: subtotal.toFixed(2) },
+              shipping: { currency_code: 'USD', value: shipping.toFixed(2) },
+              discount: { currency_code: 'USD', value: discount.toFixed(2) }
             }
           },
           items: cart.map(item => ({
@@ -200,9 +315,7 @@
             quantity: String(item.qty)
           })),
           shipping: {
-            name: {
-              full_name: `${document.getElementById('first-name').value} ${document.getElementById('last-name').value}`
-            },
+            name: { full_name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value },
             address: {
               address_line_1: document.getElementById('address').value,
               admin_area_2: document.getElementById('city').value,
@@ -217,43 +330,49 @@
 
     async onApprove(data, actions) {
       const order = await actions.order.capture();
-      const shipping = cartTotal() >= 50 ? 0 : 5.99;
+      const shipping = getShippingCost();
+      const discount = calcDiscount();
 
       // Save order to Supabase
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+        await fetch(SUPABASE_URL + '/rest/v1/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
+            'Authorization': 'Bearer ' + SUPABASE_KEY
           },
           body: JSON.stringify({
             payment_intent_id: order.id,
-            customer_name: `${document.getElementById('first-name').value} ${document.getElementById('last-name').value}`,
+            customer_name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value,
             customer_email: document.getElementById('email').value,
-            address: `${document.getElementById('address').value}, ${document.getElementById('city').value}, ${document.getElementById('state').value} ${document.getElementById('zip').value}`,
+            address: document.getElementById('address').value + ', ' + document.getElementById('city').value + ', ' + document.getElementById('state').value + ' ' + document.getElementById('zip').value,
             items: cart,
             subtotal: cartTotal(),
+            discount: discount,
+            promo_code: appliedPromo ? appliedPromo.code : null,
             shipping,
-            total: cartTotal() + shipping,
+            total: getFinalTotal(),
             status: 'paid',
             payment_method: 'paypal'
           })
         });
+
+        // Increment promo uses
+        await incrementPromoUses();
+
       } catch (err) {
         console.error('Could not save order:', err);
       }
 
-      // Save for confirmation page
       localStorage.setItem('hh_last_order', JSON.stringify({
-        name: `${document.getElementById('first-name').value} ${document.getElementById('last-name').value}`,
+        name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value,
         email: document.getElementById('email').value,
-        total: (cartTotal() + shipping).toFixed(2),
-        id: order.id.slice(-8).toUpperCase()
+        total: getFinalTotal().toFixed(2),
+        id: order.id.slice(-8).toUpperCase(),
+        promo: appliedPromo ? appliedPromo.code : null
       }));
 
-      // Clear cart and redirect
       cart = [];
       saveCart();
       window.location.href = 'confirmation.html';
@@ -270,8 +389,25 @@
 
   }).render('#paypal-button-container');
 
-  // Init
-  renderSummary();
+  // Load shipping settings from Supabase
+  async function loadShippingSettings() {
+    try {
+      const res = await fetch(
+        SUPABASE_URL + '/rest/v1/settings?key=in.(free_shipping_threshold,shipping_cost)&select=key,value',
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      const settings = await res.json();
+      settings.forEach(s => {
+        if (s.key === 'free_shipping_threshold') localStorage.setItem('hh_free_shipping_threshold', s.value);
+        if (s.key === 'shipping_cost') localStorage.setItem('hh_shipping_cost', s.value);
+      });
+    } catch (err) {
+      console.log('Using default shipping settings');
+    }
+    renderSummary();
+  }
+
+  loadShippingSettings();
 </script>
 </body>
 </html>
