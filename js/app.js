@@ -4,8 +4,8 @@
 
 // ── SUPABASE CONFIG ──
 // Replace these with your actual Supabase credentials from supabase.com
-const SUPABASE_URL = 'https://mirprmehihimttgxdcvq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_eYgxk4-ygfHs-0FNF2RPdg_T2tJFEdO';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 // ── STRIPE CONFIG ──
 // Replace with your Stripe publishable key from stripe.com/dashboard
