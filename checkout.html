@@ -206,12 +206,7 @@
       const itemShipping = parseFloat(item.shipping_cost) || 0;
       totalShipping += itemShipping * item.qty;
     });
-    // If no per-item shipping set, fall back to store default
-    if (totalShipping === 0) {
-      const threshold = parseFloat(localStorage.getItem('hh_free_shipping_threshold') || '50');
-      const cost = parseFloat(localStorage.getItem('hh_shipping_cost') || '5.99');
-      return cartTotal() >= threshold ? 0 : cost;
-    }
+    // If no per-item shipping set, return 0 (Hammond sets shipping per product in admin)
     return totalShipping;
   }
 
