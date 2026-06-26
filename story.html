@@ -33,30 +33,14 @@
 </header>
 
 <div class="page-header">
-  <h1>Our Story</h1>
-  <p>Where hustle meets heart</p>
+  <h1 id="story-title">Our Story</h1>
+  <p id="story-subtitle">Where hustle meets heart</p>
 </div>
 
 <section class="section">
   <div class="container">
-    <div class="story-page">
-      <span class="eyebrow">Hammond Homestead</span>
-      <h1>Made by hand.<br>Built on hustle.</h1>
-      <hr style="border:none;border-top:1px solid #E8DDD0;margin:2rem 0;">
-
-      <p>Hammond Homestead was born from a simple belief — that the things we bring into our homes should be made with intention, care, and real human hands. Not mass-produced on a factory floor, but crafted one at a time, with pride in every detail.</p>
-
-      <p>Based in Nashville, Michigan, we pour our hearts into every product we make. Whether it's a hand-poured candle, a natural body scrub, or a carefully assembled gift set — each item carries a piece of who we are and what we stand for.</p>
-
-      <p>The name Hammond Homestead is more than a brand. It's a reminder that building something meaningful takes hustle, patience, and the belief that your next dream is always worth chasing. That's what our slogan means to us: <em>"Hustle and Motivation Makes Our Next Dream."</em></p>
-
-      <p>We're grateful for every order, every customer, and every person who chooses to bring a piece of the homestead into their home. Thank you for being part of this journey.</p>
-
-      <hr style="border:none;border-top:1px solid #E8DDD0;margin:2rem 0;">
-
-      <div style="text-align:center;">
-        <a href="shop.html" class="btn btn-primary">Shop Our Products</a>
-      </div>
+    <div class="story-page" id="story-content">
+      <p style="text-align:center;color:#7A6A58;font-family:Arial,sans-serif;">Loading...</p>
     </div>
   </div>
 </section>
@@ -66,7 +50,7 @@
   <div class="cart-drawer-header"><h3>Your Cart</h3><button class="cart-close" onclick="closeCart()">✕</button></div>
   <div class="cart-items" id="cart-items"><div class="cart-empty" id="cart-empty">Your cart is empty.</div></div>
   <div class="cart-footer hidden" id="cart-footer">
-    <div class="cart-subtotal"><span>Subtotal</span><span class="cart-subtotal-amount" id="cart-subtotal">$0.00</span></div>
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
     <a href="checkout.html" class="btn btn-primary btn-full">Checkout →</a>
     <button onclick="closeCart()" class="btn btn-outline btn-full mt-1">Continue Shopping</button>
   </div>
@@ -75,9 +59,9 @@
 <footer class="site-footer">
   <div class="footer-grid">
     <div class="footer-col"><h4>Hammond Homestead</h4><p>Handmade goods crafted with hustle and heart from Nashville, Michigan.</p></div>
-    <div class="footer-col"><h4>Shop</h4><a href="shop.html">All Products</a><a href="shop.html">Bestsellers</a></div>
     <div class="footer-col" id="footer-social-col"></div>
-    <div class="footer-col"><h4>Info</h4><a href="story.html">Our Story</a><a href="contact.html">Contact</a><a href="shipping.html">Shipping</a></div>
+    <div class="footer-col"><h4>Shop</h4><a href="shop.html">All Products</a><a href="shop.html">Gift Sets</a><a href="shop.html">New Arrivals</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="story.html">Our Story</a><a href="contact.html">Contact Us</a><a href="returns.html">Returns</a></div>
   </div>
   <div class="footer-bottom">
     <p class="footer-slogan">"Hustle and Motivation Makes Our Next Dream"</p>
@@ -87,7 +71,54 @@
 
 <script src="js/app.js"></script>
 <script src="js/enhancements.js"></script>
-<script src="js/custom-order.js"></script>
 <script src="js/footer-social.js"></script>
+<script src="js/custom-order.js"></script>
+<script>
+async function loadStory() {
+  const content = document.getElementById('story-content');
+  const title = document.getElementById('story-title');
+  const subtitle = document.getElementById('story-subtitle');
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/settings?key=in.(story_title,story_subtitle,story_content)&select=key,value', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const settings = await res.json();
+    const map = {};
+    settings.forEach(s => map[s.key] = s.value);
+
+    if (map.story_title) title.textContent = map.story_title;
+    if (map.story_subtitle) subtitle.textContent = map.story_subtitle;
+
+    if (map.story_content) {
+      // Render paragraphs — split by double newline
+      const paragraphs = map.story_content.split('\n\n').filter(p => p.trim());
+      content.innerHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('')
+        + '<hr style="border:none;border-top:1px solid #E8DDD0;margin:2rem 0;">'
+        + '<div style="text-align:center;"><a href="shop.html" class="btn btn-primary">Shop Our Products</a></div>';
+    } else {
+      // Default story content
+      content.innerHTML = `
+        <p>Hammond Homestead was born from a simple belief — that the things we bring into our homes should be made with intention, care, and real human hands. Not mass-produced on a factory floor, but crafted one at a time, with pride in every detail.</p>
+        <p>Based in Nashville, Michigan, we pour our hearts into every product we make. Whether it's a hand-poured candle, a natural body scrub, or a carefully assembled gift set — each item carries a piece of who we are and what we stand for.</p>
+        <p>The name Hammond Homestead is more than a brand. It's a reminder that building something meaningful takes hustle, patience, and the belief that your next dream is always worth chasing. That's what our slogan means to us: <em>"Hustle and Motivation Makes Our Next Dream."</em></p>
+        <p>We're grateful for every order, every customer, and every person who chooses to bring a piece of the homestead into their home. Thank you for being part of this journey.</p>
+        <hr style="border:none;border-top:1px solid #E8DDD0;margin:2rem 0;">
+        <div style="text-align:center;"><a href="shop.html" class="btn btn-primary">Shop Our Products</a></div>
+      `;
+    }
+  } catch (err) {
+    // Show default if Supabase fails
+    content.innerHTML = `
+      <p>Hammond Homestead was born from a simple belief — that the things we bring into our homes should be made with intention, care, and real human hands.</p>
+      <p>Based in Nashville, Michigan, we pour our hearts into every product we make.</p>
+      <hr style="border:none;border-top:1px solid #E8DDD0;margin:2rem 0;">
+      <div style="text-align:center;"><a href="shop.html" class="btn btn-primary">Shop Our Products</a></div>
+    `;
+  }
+}
+
+loadStory();
+</script>
 </body>
 </html>
