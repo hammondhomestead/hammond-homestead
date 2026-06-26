@@ -109,6 +109,7 @@
       <button class="tab-btn" onclick="switchTab('orders',this)">Orders</button>
       <button class="tab-btn" onclick="switchTab('promos',this)">Promo Codes</button>
       <button class="tab-btn" onclick="switchTab('social',this)">Social Media</button>
+      <button class="tab-btn" onclick="switchTab('story',this)">Our Story</button>
     </div>
 
     <!-- PRODUCTS TAB -->
@@ -265,6 +266,40 @@
             <div class="admin-card-header"><h3>Active Codes (<span id="promo-count">0</span>)</h3></div>
             <div id="promo-list"><div class="admin-empty">No promo codes yet.</div></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUR STORY TAB -->
+    <div id="tab-story" class="tab-panel">
+      <div class="admin-card" style="max-width:760px;">
+        <div class="admin-card-header">
+          <h3>Our Story Page</h3>
+          <a href="../story.html" target="_blank" class="btn btn-sm btn-outline">Preview →</a>
+        </div>
+        <div class="admin-card-body">
+          <p style="font-size:.82rem;color:#7A6A58;font-family:Arial,sans-serif;margin-bottom:1.25rem;">
+            Edit the text that appears on the Our Story page. Separate paragraphs with a blank line.
+          </p>
+          <div class="field">
+            <label>Page Title</label>
+            <input type="text" id="story-title" placeholder="Our Story">
+          </div>
+          <div class="field">
+            <label>Page Subtitle</label>
+            <input type="text" id="story-subtitle" placeholder="Where hustle meets heart">
+          </div>
+          <div class="field">
+            <label>Story Content</label>
+            <textarea id="story-content" style="min-height:320px;font-family:Arial,sans-serif;font-size:.875rem;line-height:1.7;"
+              placeholder="Write Hammond's story here...
+
+Separate paragraphs with a blank line between them.
+
+Each blank line creates a new paragraph on the page."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="saveStory()" id="story-save-btn">Save Story</button>
+          <p id="story-msg" style="font-size:.82rem;text-align:center;margin-top:.6rem;min-height:1.2em;"></p>
         </div>
       </div>
     </div>
