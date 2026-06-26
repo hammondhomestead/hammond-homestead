@@ -102,7 +102,7 @@
     <div class="footer-col"><h4>Hammond Homestead</h4><p>Handmade goods crafted with hustle and heart from Nashville, Michigan.</p></div>
     <div class="footer-col"><h4>Shop</h4><a href="shop.html">All Products</a><a href="shop.html">Gift Sets</a></div>
     <div class="footer-col" id="footer-social-col"></div>
-    <div class="footer-col"><h4>Info</h4><a href="story.html">Our Story</a><a href="contact.html">Contact</a><a href="returns.html">Returns</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="story.html">Our Story</a><a href="contact.html">Contact</a></div>
   </div>
   <div class="footer-bottom">
     <p class="footer-slogan">"Hustle and Motivation Makes Our Next Dream"</p>
@@ -127,7 +127,7 @@ async function loadShopProducts() {
   container.innerHTML = '<p class="text-center text-muted" style="padding:2rem;">Loading products...</p>';
 
   try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/products?select=*&active=eq.true&order=sort_order.asc,created_at.desc', {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/products?select=id,name,description,price,image_url,badge,category,sort_order,active&active=eq.true&order=sort_order.asc,created_at.desc', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
     allProductsData = await res.json();
@@ -141,11 +141,13 @@ async function loadShopProducts() {
 function buildCategoryFilters() {
   const bar = document.getElementById('category-filters');
   const categories = ['all', ...new Set(allProductsData.map(p => p.category).filter(Boolean))];
+  // Debug: log what categories we found
+  console.log('Categories found:', categories);
 
   bar.innerHTML = categories.map(cat => {
     const count = cat === 'all'
       ? allProductsData.length
-      : allProductsData.filter(p => p.category === cat).length;
+      : allProductsData.filter(p => (p.category || '').toLowerCase() === cat.toLowerCase()).length;
     const label = cat === 'all' ? 'All' : cat;
     const isActive = currentCategory === cat;
     return `<button onclick="setCategory('${cat}')" id="cat-btn-${cat}"
@@ -159,7 +161,7 @@ function buildCategoryFilters() {
 }
 
 function setCategory(cat) {
-  currentCategory = cat;
+  currentCategory = cat.toLowerCase();
   // Update URL without reload
   const url = new URL(window.location);
   if (cat === 'all') url.searchParams.delete('category');
@@ -177,7 +179,7 @@ function applySortFilter() {
 
   let filtered = currentCategory === 'all'
     ? [...allProductsData]
-    : allProductsData.filter(p => p.category === currentCategory);
+    : allProductsData.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
 
   // Sort
   if (sort === 'price-low') filtered.sort((a, b) => a.price - b.price);
