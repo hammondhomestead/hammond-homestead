@@ -322,30 +322,13 @@
     createOrder(data, actions) {
       const discount = calcDiscount();
       const subtotal = cartTotal();
-      const total = Math.max(0, subtotal - discount);
+      const total = Math.max(0.01, subtotal - discount);
       return actions.order.create({
         purchase_units: [{
+          description: 'Hammond Homestead Order',
           amount: {
-            value: total.toFixed(2),
-            breakdown: {
-              item_total: { currency_code: 'USD', value: subtotal.toFixed(2) },
-              discount: { currency_code: 'USD', value: discount.toFixed(2) }
-            }
-          },
-          items: cart.map(item => ({
-            name: item.name,
-            unit_amount: { currency_code: 'USD', value: parseFloat(item.price).toFixed(2) },
-            quantity: String(item.qty)
-          })),
-          shipping: {
-            name: { full_name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value },
-            address: {
-              address_line_1: document.getElementById('address').value,
-              admin_area_2: document.getElementById('city').value,
-              admin_area_1: document.getElementById('state').value,
-              postal_code: document.getElementById('zip').value,
-              country_code: 'US'
-            }
+            currency_code: 'USD',
+            value: total.toFixed(2)
           }
         }]
       });
