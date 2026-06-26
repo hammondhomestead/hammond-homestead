@@ -541,7 +541,10 @@ async function saveProduct(){
   try{
     let imageUrl=currentImageUrl;
     if(currentImageBase64)imageUrl=await uploadImage(currentImageBase64);
-    const product={name,description:desc,price,badge:badge||null,
+    const categorySelect=document.getElementById('p-category').value;
+    const categoryCustom=document.getElementById('p-category-custom').value.trim();
+    const category=categoryCustom||categorySelect||null;
+    const product={name,description:desc,price,badge:badge||null,category:category,
       stock:stock?parseInt(stock):null,sort_order:sort?parseInt(sort):0,active};
     if(imageUrl!==null)product.image_url=imageUrl;
     const method=editId?'PATCH':'POST';
