@@ -187,9 +187,7 @@ h4 { font-size: 1.05rem; }
   text-decoration: none;
 }
 .header-logo-ring {
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  border: 1.5px solid var(--taupe-light);
+  width: 42px; height: 42px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
