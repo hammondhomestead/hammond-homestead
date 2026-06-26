@@ -218,6 +218,8 @@ async function loadProducts(containerId, limit) {
       return;
     }
 
+    // Ensure shipping_cost is available on each product
+    products = products.map(p => ({ ...p, shipping_cost: parseFloat(p.shipping_cost) || 0 }));
     container.innerHTML = products.map(buildProductCard).join('');
   } catch (err) {
     console.error(err);
