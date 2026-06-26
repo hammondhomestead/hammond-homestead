@@ -19,7 +19,7 @@ function initCustomOrderModal() {
     #custom-order-fab {
       position: fixed;
       bottom: 2rem;
-      right: 1.5rem;
+      left: 1.5rem;
       background: #1A1710;
       color: #FAF6EE;
       border: 2px solid #8A7A65;
