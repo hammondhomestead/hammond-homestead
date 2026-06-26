@@ -21,8 +21,8 @@
 </header>
 
 <section class="checkout-page">
-  <div class="container">
-    <div class="checkout-layout">
+  <div class="container" style="max-width:680px;">
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
 
       <!-- ORDER SUMMARY -->
       <div>
@@ -87,11 +87,20 @@
           <div class="field"><label>Country</label><input type="text" id="country" value="United States"></div>
         </div>
 
-        <div style="background:#F2EBE0;border:.5px solid #E8DDD0;border-radius:6px;padding:1rem;margin-top:.5rem;">
-          <p style="font-size:.82rem;color:#7A6A58;font-family:Arial,sans-serif;margin:0;line-height:1.6;">
-            👆 Fill in your details above, then click the <strong>PayPal button on the left</strong> to complete your purchase securely.
+      </div>
+
+      <!-- PAYPAL PAYMENT -->
+      <div>
+        <div style="background:#F2EBE0;border:.5px solid #E8DDD0;border-radius:6px;padding:1.25rem;margin-bottom:1rem;">
+          <p style="font-size:.85rem;color:#5C4E3C;font-family:Arial,sans-serif;margin:0;line-height:1.6;font-weight:700;">
+            Step 2 — Complete Payment
+          </p>
+          <p style="font-size:.8rem;color:#7A6A58;font-family:Arial,sans-serif;margin-top:4px;line-height:1.6;">
+            Pay with your PayPal account or click "Debit or Credit Card" to pay without one.
           </p>
         </div>
+        <div id="paypal-button-container"></div>
+        <p class="secure-note" style="margin-top:1rem;">🔒 Secured by PayPal · SSL Encrypted</p>
       </div>
 
     </div>
@@ -105,7 +114,7 @@
 </footer>
 
 <script src="js/app.js"></script>
-<script src="https://www.paypal.com/sdk/js?client-id=ASCjxDZOJxTdy3v6BLIDzxawUyj0KHfaU8a3RqTroOctgsM3yUs1xjaUhywEUdRSf20w6BvbzL0lHWWX&currency=USD&disable-funding=card,credit,paylater"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=ASCjxDZOJxTdy3v6BLIDzxawUyj0KHfaU8a3RqTroOctgsM3yUs1xjaUhywEUdRSf20w6BvbzL0lHWWX&currency=USD"></script>
 <script>
   let appliedPromo = null;
 
