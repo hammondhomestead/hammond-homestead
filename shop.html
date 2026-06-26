@@ -45,7 +45,35 @@
 
 <section class="section">
   <div class="container">
+
+    <!-- FILTER + SORT BAR -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+      <div id="category-filters" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-size:0.78rem;color:#7A6A58;font-family:Arial,sans-serif;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;">Sort by</label>
+        <select id="sort-select" onchange="applySortFilter()"
+          style="padding:0.45rem 0.85rem;border:1px solid #E8DDD0;border-radius:3px;font-size:0.85rem;font-family:Arial,sans-serif;color:#2A1A0A;background:#fff;cursor:pointer;">
+          <option value="newest">Newest</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="name">Name A–Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RESULTS COUNT -->
+    <p id="results-count" style="font-size:0.82rem;color:#7A6A58;font-family:Arial,sans-serif;margin-bottom:1.25rem;"></p>
+
+    <!-- PRODUCT GRID -->
     <div class="product-grid" id="all-products"></div>
+
+    <!-- EMPTY STATE -->
+    <div id="no-results" style="display:none;text-align:center;padding:4rem 1rem;">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">🌾</div>
+      <p style="color:#7A6A58;font-family:Arial,sans-serif;">No products found in this category.</p>
+      <button onclick="setCategory('all')" style="margin-top:1rem;background:#8A7A65;color:#FAF6EE;border:none;padding:8px 20px;border-radius:3px;font-family:Arial,sans-serif;font-size:0.85rem;cursor:pointer;">View All Products</button>
+    </div>
+
   </div>
 </section>
 
@@ -86,6 +114,90 @@
 <script src="js/enhancements.js"></script>
 <script src="js/custom-order.js"></script>
 <script src="js/footer-social.js"></script>
-<script>loadProducts('all-products');</script>
+<script>
+let allProductsData = [];
+let currentCategory = 'all';
+
+// Check URL for category param
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('category')) currentCategory = urlParams.get('category');
+
+async function loadShopProducts() {
+  const container = document.getElementById('all-products');
+  container.innerHTML = '<p class="text-center text-muted" style="padding:2rem;">Loading products...</p>';
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/products?select=*&active=eq.true&order=sort_order.asc,created_at.desc', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    allProductsData = await res.json();
+    buildCategoryFilters();
+    applySortFilter();
+  } catch (err) {
+    container.innerHTML = '<p class="text-center text-muted" style="padding:2rem;">Could not load products. Please refresh.</p>';
+  }
+}
+
+function buildCategoryFilters() {
+  const bar = document.getElementById('category-filters');
+  const categories = ['all', ...new Set(allProductsData.map(p => p.category).filter(Boolean))];
+
+  bar.innerHTML = categories.map(cat => {
+    const count = cat === 'all'
+      ? allProductsData.length
+      : allProductsData.filter(p => p.category === cat).length;
+    const label = cat === 'all' ? 'All' : cat;
+    const isActive = currentCategory === cat;
+    return `<button onclick="setCategory('${cat}')" id="cat-btn-${cat}"
+      style="padding:6px 14px;border-radius:3px;font-size:0.78rem;font-family:Arial,sans-serif;font-weight:700;
+      letter-spacing:0.05em;cursor:pointer;border:1px solid ${isActive ? '#8A7A65' : '#E8DDD0'};
+      background:${isActive ? '#8A7A65' : 'transparent'};color:${isActive ? '#FAF6EE' : '#8A7A65'};
+      transition:all 0.2s;">
+      ${label} <span style="opacity:0.7;font-weight:400;">(${count})</span>
+    </button>`;
+  }).join('');
+}
+
+function setCategory(cat) {
+  currentCategory = cat;
+  // Update URL without reload
+  const url = new URL(window.location);
+  if (cat === 'all') url.searchParams.delete('category');
+  else url.searchParams.set('category', cat);
+  window.history.replaceState({}, '', url);
+  buildCategoryFilters();
+  applySortFilter();
+}
+
+function applySortFilter() {
+  const sort = document.getElementById('sort-select').value;
+  const container = document.getElementById('all-products');
+  const noResults = document.getElementById('no-results');
+  const countEl = document.getElementById('results-count');
+
+  let filtered = currentCategory === 'all'
+    ? [...allProductsData]
+    : allProductsData.filter(p => p.category === currentCategory);
+
+  // Sort
+  if (sort === 'price-low') filtered.sort((a, b) => a.price - b.price);
+  else if (sort === 'price-high') filtered.sort((a, b) => b.price - a.price);
+  else if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    noResults.style.display = 'block';
+    countEl.textContent = '';
+    return;
+  }
+
+  noResults.style.display = 'none';
+  const catLabel = currentCategory === 'all' ? 'All Products' : currentCategory;
+  countEl.textContent = filtered.length + ' ' + (filtered.length === 1 ? 'product' : 'products') + (currentCategory !== 'all' ? ' in ' + catLabel : '');
+  container.innerHTML = filtered.map(buildProductCard).join('');
+}
+
+loadShopProducts();
+</script>
 </body>
 </html>
