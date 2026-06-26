@@ -237,7 +237,6 @@
 
     const shipping = getShippingCost();
     const discount = calcDiscount();
-    const threshold = parseFloat(localStorage.getItem('hh_free_shipping_threshold') || '50');
 
     if (shippingEl) shippingEl.textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
 
@@ -392,24 +391,8 @@
   }).render('#paypal-button-container');
 
   // Load shipping settings from Supabase
-  async function loadShippingSettings() {
-    try {
-      const res = await fetch(
-        SUPABASE_URL + '/rest/v1/settings?key=in.(free_shipping_threshold,shipping_cost)&select=key,value',
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-      );
-      const settings = await res.json();
-      settings.forEach(s => {
-        if (s.key === 'free_shipping_threshold') localStorage.setItem('hh_free_shipping_threshold', s.value);
-        if (s.key === 'shipping_cost') localStorage.setItem('hh_shipping_cost', s.value);
-      });
-    } catch (err) {
-      console.log('Using default shipping settings');
-    }
-    renderSummary();
-  }
-
-  loadShippingSettings();
+  // Render summary immediately - shipping is per product set in admin
+  renderSummary();
 </script>
 </body>
 </html>
