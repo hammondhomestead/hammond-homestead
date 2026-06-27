@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"> 
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Hammond Homestead</title>
   <link rel="stylesheet" href="../css/style.css">
@@ -404,10 +404,11 @@ Each blank line creates a new paragraph on the page."></textarea>
     <input type="hidden" id="fulfill-customer-name">
     <div class="field"><label>Tracking Number (optional)</label><input type="text" id="tracking-number" placeholder="e.g. 9400111899223412345678"></div>
     <div class="field"><label>Carrier</label><select id="tracking-carrier"><option value="USPS">USPS</option><option value="UPS">UPS</option><option value="FedEx">FedEx</option><option value="Other">Other</option></select></div>
-    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
       <label class="toggle-switch"><input type="checkbox" id="send-email-toggle" checked><span class="toggle-slider"></span></label>
       <span style="font-size:.85rem;color:#2A1A0A;font-family:Arial,sans-serif;">Email customer with tracking info</span>
     </div>
+    <div id="resend-key-status" style="font-size:.78rem;font-family:Arial,sans-serif;padding:.5rem .75rem;border-radius:4px;margin-bottom:1rem;"></div>
     <div style="display:flex;gap:.75rem;">
       <button class="btn btn-outline" onclick="closeFulfillModal()" style="flex:1;">Cancel</button>
       <button class="btn btn-primary" onclick="fulfillOrder()" style="flex:1;" id="fulfill-btn">Mark as Shipped →</button>
@@ -1143,9 +1144,11 @@ async function saveSettings(){
   const storeEmail=document.getElementById('setting-store-email').value.trim();
   const msg=document.getElementById('settings-msg');
   if(announcement)localStorage.setItem('hh_announcement',announcement);
-  if(resendKey)localStorage.setItem('hh_resend_key',resendKey);
+  if(resendKey){
+    localStorage.setItem('hh_resend_key',resendKey);
+    console.log('Resend key saved to localStorage:', resendKey.substring(0,8)+'...');
+  }
   if(storeEmail)localStorage.setItem('hh_store_email',storeEmail);
-  console.log('Saved to localStorage - resend key:', resendKey ? 'YES' : 'EMPTY - not overwriting existing');
   try{
     const settings=[
       {key:'announcement',value:announcement},      {key:'store_email',value:storeEmail}
