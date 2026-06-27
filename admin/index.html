@@ -403,14 +403,8 @@ Each blank line creates a new paragraph on the page."></textarea>
       <div class="settings-label"><h4>Announcement Bar Text</h4><p>Shown at the top of every page</p></div>
       <input type="text" class="settings-input" id="setting-announcement" placeholder="Free shipping over $50...">
     </div>
-    <div class="settings-row">
-      <div class="settings-label"><h4>Free Shipping Threshold</h4><p>Orders over this get free shipping</p></div>
-      <div style="display:flex;align-items:center;gap:4px;"><span style="font-family:Arial,sans-serif;color:#7A6A58;">$</span><input type="number" class="settings-input" id="setting-free-shipping" placeholder="50" min="0" style="width:100px;"></div>
-    </div>
-    <div class="settings-row">
-      <div class="settings-label"><h4>Standard Shipping Cost</h4><p>Charged under the free shipping threshold</p></div>
-      <div style="display:flex;align-items:center;gap:4px;"><span style="font-family:Arial,sans-serif;color:#7A6A58;">$</span><input type="number" class="settings-input" id="setting-shipping-cost" placeholder="5.99" min="0" step="0.01" style="width:100px;"></div>
-    </div>
+
+
     <div class="settings-row">
       <div class="settings-label"><h4>Resend API Key</h4><p>For shipping emails (<a href="https://resend.com" target="_blank" style="color:#8A7A65;">resend.com</a>)</p></div>
       <input type="password" class="settings-input" id="setting-resend-key" placeholder="re_••••••••">
@@ -1068,10 +1062,7 @@ function openSettings(){
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 
 function loadSettingsValues(){
-  document.getElementById('setting-announcement').value=localStorage.getItem('hh_announcement')||'Free shipping on orders over $50 · Handmade in Nashville, MI · Secure checkout';
-  document.getElementById('setting-free-shipping').value=localStorage.getItem('hh_free_shipping_threshold')||'50';
-  document.getElementById('setting-shipping-cost').value=localStorage.getItem('hh_shipping_cost')||'5.99';
-  document.getElementById('setting-resend-key').value=localStorage.getItem('hh_resend_key')||'';
+  document.getElementById('setting-announcement').value=localStorage.getItem('hh_announcement')||'Free shipping on orders over $50 · Handmade in Nashville, MI · Secure checkout';  document.getElementById('setting-resend-key').value=localStorage.getItem('hh_resend_key')||'';
   document.getElementById('setting-store-email').value=localStorage.getItem('hh_store_email')||'';
   const isClosed=localStorage.getItem('hh_store_closed')==='true';
   document.getElementById('setting-store-closed').checked=isClosed;
@@ -1080,22 +1071,14 @@ function loadSettingsValues(){
 
 async function saveSettings(){
   const announcement=document.getElementById('setting-announcement').value.trim();
-  const freeShipping=parseFloat(document.getElementById('setting-free-shipping').value);
-  const shippingCost=parseFloat(document.getElementById('setting-shipping-cost').value);
   const resendKey=document.getElementById('setting-resend-key').value.trim();
   const storeEmail=document.getElementById('setting-store-email').value.trim();
   const msg=document.getElementById('settings-msg');
-  if(announcement)localStorage.setItem('hh_announcement',announcement);
-  if(!isNaN(freeShipping))localStorage.setItem('hh_free_shipping_threshold',freeShipping);
-  if(!isNaN(shippingCost))localStorage.setItem('hh_shipping_cost',shippingCost);
-  if(resendKey)localStorage.setItem('hh_resend_key',resendKey);
+  if(announcement)localStorage.setItem('hh_announcement',announcement);  if(resendKey)localStorage.setItem('hh_resend_key',resendKey);
   if(storeEmail)localStorage.setItem('hh_store_email',storeEmail);
   try{
     const settings=[
-      {key:'announcement',value:announcement},
-      {key:'free_shipping_threshold',value:String(freeShipping)},
-      {key:'shipping_cost',value:String(shippingCost)},
-      {key:'store_email',value:storeEmail}
+      {key:'announcement',value:announcement},      {key:'store_email',value:storeEmail}
     ];
     await Promise.all(settings.map(s=>fetch(SUPABASE_URL+'/rest/v1/settings?key=eq.'+s.key,{
       method:'POST',
