@@ -3,6 +3,10 @@
    Appears after 4 seconds of browsing
    ============================================================ */
 
+// ── FORMSPREE CONFIG ──
+// Sign up free at formspree.io, create a form, paste the endpoint here
+const FORMSPREE_ENDPOINT = 'YOUR_FORMSPREE_ENDPOINT';
+
 function initCustomOrderModal() {
 
   // Don't show on checkout, confirmation, or admin pages
@@ -440,18 +444,46 @@ async function submitDetailed() {
   showSuccess();
 }
 
-/* ── SAVE TO SUPABASE ── */
+/* ── SAVE TO SUPABASE + EMAIL VIA FORMSPREE ── */
 async function saveCustomOrder(data) {
-  const res = await fetch(SUPABASE_URL + '/rest/v1/custom_orders', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY
-    },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error('Failed to save');
+  // Save to Supabase
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/custom_orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) console.log('Supabase save failed:', await res.text());
+  } catch(err) {
+    console.log('Supabase error:', err);
+  }
+
+  // Send email via Formspree
+  if (FORMSPREE_ENDPOINT && FORMSPREE_ENDPOINT !== 'YOUR_FORMSPREE_ENDPOINT') {
+    try {
+      await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          type: data.type === 'quick' ? 'Quick Inquiry' : 'Detailed Request',
+          product_type: data.product_type || 'Not specified',
+          quantity: data.quantity || 'Not specified',
+          budget: data.budget || 'Not specified',
+          date_needed: data.date_needed || 'Not specified',
+          message: data.message,
+          _subject: 'New Custom Order Request from ' + data.name + ' — Hammond Homestead'
+        })
+      });
+    } catch(err) {
+      console.log('Formspree error:', err);
+    }
+  }
 }
 
 /* ── SHOW SUCCESS ── */
