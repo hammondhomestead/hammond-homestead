@@ -110,6 +110,7 @@
       <button class="tab-btn" onclick="switchTab('promos',this)">Promo Codes</button>
       <button class="tab-btn" onclick="switchTab('social',this)">Social Media</button>
       <button class="tab-btn" onclick="switchTab('story',this)">Our Story</button>
+      <button class="tab-btn" onclick="switchTab('custom-orders',this)">Custom Orders</button>
     </div>
 
     <!-- PRODUCTS TAB -->
@@ -269,6 +270,42 @@
             <div class="admin-card-header"><h3>Active Codes (<span id="promo-count">0</span>)</h3></div>
             <div id="promo-list"><div class="admin-empty">No promo codes yet.</div></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOM ORDERS TAB -->
+    <div id="tab-custom-orders" class="tab-panel">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>Custom Order Requests (<span id="custom-order-count">0</span>)</h3>
+          <button class="btn btn-sm btn-outline" onclick="exportCustomOrders()">Export CSV</button>
+        </div>
+        <div class="admin-card-body" style="padding-top:0;">
+          <div class="order-filter-bar">
+            <button class="order-filter-btn active" onclick="filterCustomOrders('all',this)">All</button>
+            <button class="order-filter-btn" onclick="filterCustomOrders('quick',this)">Quick Inquiries</button>
+            <button class="order-filter-btn" onclick="filterCustomOrders('detailed',this)">Detailed Requests</button>
+            <input class="search-input" id="custom-order-search" placeholder="🔍 Search name or email..." oninput="searchCustomOrders(this.value)">
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Product</th>
+                <th>Budget</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody id="custom-orders-body">
+              <tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#7A6A58;">No custom orders yet.</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
