@@ -197,6 +197,13 @@
 </footer>
 
 <script src="js/app.js"></script>
+<script>
+  // Ensure keys are available even if app.js loads late
+  if (typeof SUPABASE_URL === 'undefined') {
+    var SUPABASE_URL = 'https://mirprmehihimttgxdcvq.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pcnBybWVoaWhpbXR0Z3hkY3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNzgyNzgsImV4cCI6MjA5Nzc1NDI3OH0.GKnX_tksrjKPS-Jyu7n7J1zT7jYIX5vvypP7jUkgczM';
+  }
+</script>
 <script src="https://www.paypal.com/sdk/js?client-id=ASCjxDZOJxTdy3v6BLIDzxawUyj0KHfaU8a3RqTroOctgsM3yUs1xjaUhywEUdRSf20w6BvbzL0lHWWX&currency=USD"></script>
 <script>
   let appliedPromo = null;
@@ -337,26 +344,40 @@
     async onApprove(data, actions) {
       const order = await actions.order.capture();
       try {
-        await fetch(SUPABASE_URL + '/rest/v1/orders', {
+        const orderData = {
+          payment_intent_id: order.id,
+          customer_name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value,
+          customer_email: document.getElementById('email').value,
+          address: document.getElementById('address').value + ', ' + document.getElementById('city').value + ', ' + document.getElementById('state').value + ' ' + document.getElementById('zip').value,
+          items: cart,
+          subtotal: cartTotal(),
+          discount: calcDiscount(),
+          promo_code: appliedPromo ? appliedPromo.code : null,
+          shipping: getShippingCost(),
+          total: getFinalTotal(),
+          status: 'paid',
+          payment_method: 'paypal'
+        };
+        console.log('Saving order:', JSON.stringify(orderData));
+        const saveRes = await fetch(SUPABASE_URL + '/rest/v1/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
-          body: JSON.stringify({
-            payment_intent_id: order.id,
-            customer_name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value,
-            customer_email: document.getElementById('email').value,
-            address: document.getElementById('address').value + ', ' + document.getElementById('city').value + ', ' + document.getElementById('state').value + ' ' + document.getElementById('zip').value,
-            items: cart,
-            subtotal: cartTotal(),
-            discount: calcDiscount(),
-            promo_code: appliedPromo ? appliedPromo.code : null,
-            shipping: getShippingCost(),
-            total: getFinalTotal(),
-            status: 'paid',
-            payment_method: 'paypal'
-          })
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(orderData)
         });
+        const saveData = await saveRes.json();
+        console.log('Supabase response status:', saveRes.status);
+        console.log('Supabase response:', JSON.stringify(saveData));
+        if (!saveRes.ok) {
+          console.error('ORDER SAVE FAILED:', saveData);
+          alert('Payment received but order could not be saved. Error: ' + JSON.stringify(saveData));
+        }
         await incrementPromoUses();
-      } catch(err) { console.error('Could not save order:', err); }
+      } catch(err) { console.error('Could not save order:', err); alert('Order save error: ' + err.message); }
 
       localStorage.setItem('hh_last_order', JSON.stringify({
         name: document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value,
