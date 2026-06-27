@@ -784,7 +784,7 @@ function renderOrders(){
       +'<td>'+(canFulfill
         ?'<button class="btn btn-sm btn-primary" style="font-size:.72rem;padding:4px 8px;" onclick="openFulfillModal(\''+o.id+'\',\''+(o.customer_email||'')+'\',\''+(o.customer_name||'').replace(/'/g,"\\'")+'\')">Ship</button>'
         :'<span style="font-size:.75rem;color:#27AE60;">✓ Shipped</span>')
-      +'<button class="btn-delete" onclick="deleteOrder(\''+o.id+'\')" style="margin-left:6px;font-size:.72rem;" title="Delete">✕</button>'
+      +'<button onclick="deleteOrder(\''+o.id+'\')" style="margin-left:6px;background:#fdecea;border:1px solid #C0392B;color:#C0392B;border-radius:3px;padding:3px 8px;font-size:.72rem;cursor:pointer;font-family:Arial,sans-serif;font-weight:700;" title="Delete order">Delete</button>'
       +'</td>'
       +'</tr>';
   }).join('');
