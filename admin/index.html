@@ -835,7 +835,7 @@ async function fulfillOrder(){
       const storeEmail=localStorage.getItem('hh_store_email')||'hello@hammond-homestead.com';
       if(resendKey){
         const trackingLine=tracking?'<p>Your tracking number is <strong>'+tracking+'</strong> ('+carrier+').</p>':'<p>Your order is on its way!</p>';
-        await fetch('https://api.resend.com/emails',{
+        const resendRes = await fetch('https://api.resend.com/emails',{
           method:'POST',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+resendKey},
           body:JSON.stringify({
@@ -853,6 +853,12 @@ async function fulfillOrder(){
               +'</div></div>'
           })
         });
+        const resendData = await resendRes.json();
+        console.log('Resend status:', resendRes.status);
+        console.log('Resend response:', JSON.stringify(resendData));
+        if(!resendRes.ok) {
+          alert('Resend error: ' + JSON.stringify(resendData));
+        }
       }else{
         msg.textContent='⚠ Shipped but no Resend key set — email not sent. Add it in Settings.';
         msg.style.color='#C8A42A';
