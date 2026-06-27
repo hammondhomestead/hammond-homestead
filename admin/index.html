@@ -857,13 +857,12 @@ async function fulfillOrder(){
           method:'POST',
           headers:{
             'Content-Type':'application/json',
-            'Authorization':'Bearer '+adminSession
+            'apikey': SUPABASE_KEY
           },
           body:JSON.stringify({
             to: email,
             subject: 'Your Hammond Homestead order has shipped! 📦',
-            html: emailHtml,
-            resendKey: resendKey
+            html: emailHtml
           })
         });
         const resendData = await resendRes.json();
