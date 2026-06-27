@@ -453,13 +453,19 @@ async function saveCustomOrder(data) {
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=representation'
       },
       body: JSON.stringify(data)
     });
-    if (!res.ok) console.log('Supabase save failed:', await res.text());
+    const resData = await res.json();
+    if (!res.ok) {
+      console.error('Custom order save failed:', JSON.stringify(resData));
+    } else {
+      console.log('Custom order saved OK:', JSON.stringify(resData));
+    }
   } catch(err) {
-    console.log('Supabase error:', err);
+    console.error('Supabase error:', err);
   }
 
   // Send email via Formspree
