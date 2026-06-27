@@ -833,6 +833,9 @@ async function fulfillOrder(){
     if(sendEmail&&email){
       const resendKey=localStorage.getItem('hh_resend_key');
       const storeEmail=localStorage.getItem('hh_store_email')||'hello@hammond-homestead.com';
+      console.log('Resend key:', resendKey ? 'FOUND: '+resendKey.substring(0,8)+'...' : 'MISSING');
+      console.log('Store email:', storeEmail);
+      console.log('Sending to:', email);
       if(resendKey){
         const trackingLine=tracking?'<p>Your tracking number is <strong>'+tracking+'</strong> ('+carrier+').</p>':'<p>Your order is on its way!</p>';
         const resendRes = await fetch('https://api.resend.com/emails',{
