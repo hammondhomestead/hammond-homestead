@@ -451,13 +451,7 @@ Each blank line creates a new paragraph on the page."></textarea>
       <div class="settings-label"><h4>Store Email</h4><p>Shown as reply-to on shipping emails</p></div>
       <input type="email" class="settings-input" id="setting-store-email" placeholder="hello@hammond-homestead.com">
     </div>
-    <div class="settings-row">
-      <div class="settings-label">
-        <h4>Shipping Email Endpoint</h4>
-        <p>Formspree URL for shipping notifications (<a href="https://formspree.io" target="_blank" style="color:#8A7A65;">formspree.io</a> — create a free form)</p>
-      </div>
-      <input type="text" class="settings-input" id="setting-shipping-formspree" placeholder="https://formspree.io/f/xxxxxxxx">
-    </div>
+
     <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
       <button class="btn btn-outline" onclick="closeSettings()" style="flex:1;">Cancel</button>
       <button class="btn btn-primary" onclick="saveSettings()" style="flex:1;">Save Settings</button>
@@ -848,27 +842,35 @@ async function fulfillOrder(){
       console.log('Sending to:', email);
       if(resendKey){
         const trackingLine=tracking?'<p>Your tracking number is <strong>'+tracking+'</strong> ('+carrier+').</p>':'<p>Your order is on its way!</p>';
-        // Send shipping email via Formspree
-        const SHIPPING_FORMSPREE = localStorage.getItem('hh_shipping_formspree') || '';
-        if(SHIPPING_FORMSPREE) {
-          const trackingText = tracking ? 'Tracking: ' + tracking + ' (' + carrier + ')' : 'Your order is on its way!';
-          await fetch(SHIPPING_FORMSPREE, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-              _to: email,
-              _subject: 'Your Hammond Homestead order has shipped! 📦',
-              customer_name: name,
-              tracking_info: trackingText,
-              message: 'Hi ' + name.split(' ')[0] + ', your Hammond Homestead order is on its way! ' + trackingText,
-              _replyto: storeEmail
-            })
-          });
-          console.log('Shipping email sent via Formspree!');
-        } else {
-          console.log('No Formspree endpoint set for shipping emails');
-          msg.textContent = '⚠ Order shipped but no email sent — add Formspree endpoint in Settings.';
-          msg.style.color = '#C8A42A';
+        // Call Supabase Edge Function to send email (avoids CORS)
+        const emailHtml = '<div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;color:#2A1A0A;">'
+          +'<div style="background:#1A1710;padding:24px;text-align:center;border-bottom:2px solid #8A7A65;">'
+          +'<h1 style="color:#FAF6EE;font-size:1.4rem;margin:0;">Hammond Homestead</h1></div>'
+          +'<div style="padding:32px 24px;">'
+          +'<h2>Your order is on its way, '+name.split(' ')[0]+'!</h2>'
+          +'<p style="color:#7A6A58;">Thanks for shopping with Hammond Homestead.</p>'
+          +trackingLine
+          +'<p style="color:#8A7A65;font-style:italic;margin-top:2rem;">"Hustle and Motivation Makes Our Next Dream"</p>'
+          +'</div></div>';
+
+        const resendRes = await fetch(SUPABASE_URL+'/functions/v1/send-email', {
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer '+adminSession
+          },
+          body:JSON.stringify({
+            to: email,
+            subject: 'Your Hammond Homestead order has shipped! 📦',
+            html: emailHtml,
+            resendKey: resendKey
+          })
+        });
+        const resendData = await resendRes.json();
+        console.log('Email send status:', resendRes.status);
+        console.log('Email send response:', JSON.stringify(resendData));
+        if(!resendRes.ok){
+          console.error('Email failed:', JSON.stringify(resendData));
         }
       }else{
         msg.textContent='⚠ Shipped but no Resend key set — email not sent. Add it in Settings.';
@@ -1148,8 +1150,6 @@ async function saveSettings(){
     console.log('Resend key saved to localStorage:', resendKey.substring(0,8)+'...');
   }
   if(storeEmail)localStorage.setItem('hh_store_email',storeEmail);
-  const shippingFormspree=document.getElementById('setting-shipping-formspree').value.trim();
-  if(shippingFormspree)localStorage.setItem('hh_shipping_formspree',shippingFormspree);
   try{
     const settings=[
       {key:'announcement',value:announcement},      {key:'store_email',value:storeEmail}
