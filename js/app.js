@@ -3,8 +3,8 @@
    ============================================================ */
 
 // ── SUPABASE CONFIG ──
-const SUPABASE_URL = 'https://mirprmehihimttgxdcvq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pcnBybWVoaWhpbXR0Z3hkY3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNzgyNzgsImV4cCI6MjA5Nzc1NDI3OH0.GKnX_tksrjKPS-Jyu7n7J1zT7jYIX5vvypP7jUkgczM';
+var SUPABASE_URL = 'https://mirprmehihimttgxdcvq.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pcnBybWVoaWhpbXR0Z3hkY3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNzgyNzgsImV4cCI6MjA5Nzc1NDI3OH0.GKnX_tksrjKPS-Jyu7n7J1zT7jYIX5vvypP7jUkgczM';
 
 // ── CART STATE ──
 let cart = JSON.parse(localStorage.getItem('hh_cart') || '[]');
