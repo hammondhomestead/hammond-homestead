@@ -9,9 +9,7 @@ function initCustomOrderModal() {
   const path = window.location.pathname;
   if (path.includes('checkout') || path.includes('confirmation') || path.includes('admin')) return;
 
-  // Don't show if dismissed in the last 24 hours
-  const dismissed = localStorage.getItem('hh_custom_dismissed_time');
-  if (dismissed && (Date.now() - parseInt(dismissed)) < 86400000) return;
+  // Always show the button
 
   // ── INJECT STYLES ──
   const style = document.createElement('style');
@@ -351,11 +349,11 @@ function initCustomOrderModal() {
   wrapper.innerHTML = html;
   document.body.appendChild(wrapper);
 
-  // ── SHOW AFTER 4 SECONDS ──
+  // ── SHOW IMMEDIATELY ──
   setTimeout(() => {
     const fab = document.getElementById('custom-order-fab');
     if (fab) fab.classList.add('visible');
-  }, 4000);
+  }, 500);
 }
 
 /* ── MODAL CONTROLS ── */
@@ -367,7 +365,7 @@ function openCustomModal() {
 function closeCustomModal() {
   document.getElementById('custom-order-overlay').classList.remove('open');
   document.body.style.overflow = '';
-  localStorage.setItem('hh_custom_dismissed_time', Date.now());
+  // dismissed
 }
 
 function handleOverlayClick(e) {
@@ -460,7 +458,7 @@ async function saveCustomOrder(data) {
 function showSuccess() {
   document.querySelectorAll('.com-panel, .com-tabs, .com-intro').forEach(el => el.style.display = 'none');
   document.getElementById('com-success').style.display = 'block';
-  localStorage.setItem('hh_custom_dismissed_time', Date.now());
+  // dismissed
   setTimeout(closeCustomModal, 3000);
 }
 
