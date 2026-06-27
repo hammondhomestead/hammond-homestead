@@ -1108,7 +1108,7 @@ function openSettings(){
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 
 function loadSettingsValues(){
-  document.getElementById('setting-announcement').value=localStorage.getItem('hh_announcement')||'Free shipping on orders over $50 · Handmade in Nashville, MI · Secure checkout';  document.getElementById('setting-resend-key').value=localStorage.getItem('hh_resend_key')||'';
+  document.getElementById('setting-announcement').value=localStorage.getItem('hh_announcement')||'Free shipping on orders over $50 · Handmade in Nashville, MI · Secure checkout';  const savedResendKey=localStorage.getItem('hh_resend_key')||'';document.getElementById('setting-resend-key').value=savedResendKey;document.getElementById('setting-resend-key').placeholder=savedResendKey?'Key saved ✓ (paste new one to update)':'re_••••••••';
   document.getElementById('setting-store-email').value=localStorage.getItem('hh_store_email')||'';
   const isClosed=localStorage.getItem('hh_store_closed')==='true';
   document.getElementById('setting-store-closed').checked=isClosed;
@@ -1120,8 +1120,10 @@ async function saveSettings(){
   const resendKey=document.getElementById('setting-resend-key').value.trim();
   const storeEmail=document.getElementById('setting-store-email').value.trim();
   const msg=document.getElementById('settings-msg');
-  if(announcement)localStorage.setItem('hh_announcement',announcement);  if(resendKey)localStorage.setItem('hh_resend_key',resendKey);
+  if(announcement)localStorage.setItem('hh_announcement',announcement);
+  if(resendKey)localStorage.setItem('hh_resend_key',resendKey);
   if(storeEmail)localStorage.setItem('hh_store_email',storeEmail);
+  console.log('Saved to localStorage - resend key:', resendKey ? 'YES' : 'EMPTY - not overwriting existing');
   try{
     const settings=[
       {key:'announcement',value:announcement},      {key:'store_email',value:storeEmail}
