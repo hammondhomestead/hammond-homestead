@@ -1273,8 +1273,7 @@ async function exportCustomOrders(){
       rows.push([new Date(o.submitted_at).toLocaleDateString(),o.name||'',o.email||'',o.type||'',
         o.product_type||'',o.quantity||'',o.budget||'',o.message||'']);
     });
-    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('
-');
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob=new Blob([csv],{type:'text/csv'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
