@@ -151,6 +151,19 @@
                 </div>
                 <p style="font-size:0.72rem;color:#B8A898;font-family:Arial,sans-serif;margin-top:4px;">Pick from the list or type a custom category name</p>
               </div>
+              <div class="form-section-title">Variants (Colors, Scents, Sizes, etc.)</div>
+              <div style="background:#F2EBE0;border-radius:6px;padding:1rem;margin-bottom:1rem;">
+                <p style="font-size:.78rem;color:#7A6A58;font-family:Arial,sans-serif;margin-bottom:.75rem;">
+                  Add variants so customers can choose options like color, scent, or size. Each variant can have its own price, stock, and photos.
+                </p>
+                <div class="field">
+                  <label>Variant Type Name</label>
+                  <input type="text" id="p-variant-type" placeholder="e.g. Color, Scent, Size, Design">
+                </div>
+                <div id="variants-list" style="margin-bottom:.75rem;"></div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="addVariantRow()" style="width:100%;">+ Add Variant</button>
+              </div>
+
               <div class="form-section-title">Photo</div>
               <div class="field">
                 <div class="upload-area" id="upload-area">
@@ -585,7 +598,8 @@ async function saveProduct(){
     let imageUrl=currentImageUrl;
     if(currentImageBase64)imageUrl=await uploadImage(currentImageBase64);
     const shipping_cost=parseFloat(document.getElementById('p-shipping').value)||0;
-    const product={name,description:desc,price,shipping_cost,badge:badge||null,category:category,stock:stock?parseInt(stock):null,sort_order:sort?parseInt(sort):0,active};
+    const variantsData=getVariantsData();
+    const product={name,description:desc,price,shipping_cost,badge:badge||null,category:category,variants:variantsData.length>0?JSON.stringify(variantsData):null,stock:stock?parseInt(stock):null,sort_order:sort?parseInt(sort):0,active};
     if(imageUrl!==null)product.image_url=imageUrl;
     const method=editId?'PATCH':'POST';
     const url=editId?SUPABASE_URL+'/rest/v1/products?id=eq.'+editId:SUPABASE_URL+'/rest/v1/products';
@@ -609,6 +623,7 @@ async function saveProduct(){
 function resetForm(){
   ['p-name','p-desc','p-price','p-badge','p-stock','p-sort','edit-product-id'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('p-active').checked=true;
+  resetVariants();
   removeImage();
   document.getElementById('form-title').textContent='Add New Product';
   document.getElementById('save-product-btn').textContent='+ Add Product';
@@ -628,6 +643,7 @@ function editProduct(p){
   document.getElementById('p-stock').value=p.stock||'';
   document.getElementById('p-sort').value=p.sort_order||0;
   document.getElementById('p-active').checked=p.active!==false;
+  loadVariantsForEdit(p);
   document.getElementById('form-title').textContent='Edit Product';
   document.getElementById('save-product-btn').textContent='Save Changes';
   document.getElementById('cancel-edit-btn').classList.remove('hidden');
