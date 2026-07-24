@@ -1171,6 +1171,83 @@ async function loadStats(){
   }catch(err){}
 }
 
+/* ── VARIANTS ── */
+var variantRows=[];
+
+function addVariantRow(v){
+  v=v||{};
+  const idx=variantRows.length;
+  variantRows.push(v);
+  const list=document.getElementById('variants-list');
+  const row=document.createElement('div');
+  row.id='variant-row-'+idx;
+  row.style.cssText='background:#fff;border:1px solid #E8DDD0;border-radius:4px;padding:.75rem;margin-bottom:.5rem;';
+  row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">'
+    +'<span style="font-size:.72rem;font-weight:700;color:#8A7A65;font-family:Arial,sans-serif;text-transform:uppercase;">Variant '+(idx+1)+'</span>'
+    +'<button type="button" onclick="removeVariantRow('+idx+')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:.8rem;font-family:Arial,sans-serif;">Remove</button>'
+    +'</div>'
+    +'<div class="field-row">'
+    +'<div class="field"><label>Name *</label><input type="text" id="vname-'+idx+'" placeholder="e.g. Lavender" value="'+(v.name||'')+'"></div>'
+    +'<div class="field"><label>Price ($)</label><input type="number" id="vprice-'+idx+'" placeholder="Same as product" min="0" step="0.01" value="'+(v.price||'')+'"></div>'
+    +'</div>'
+    +'<div class="field-row">'
+    +'<div class="field"><label>Stock</label><input type="number" id="vstock-'+idx+'" placeholder="Unlimited" min="0" value="'+(v.stock||'')+'"></div>'
+    +'<div class="field"><label>Color (hex, optional)</label>'
+    +'<div style="display:flex;gap:.5rem;align-items:center;">'
+    +'<input type="color" id="vcolor-'+idx+'" value="'+(v.color||'#8A7A65')+'" style="width:44px;height:36px;border:1px solid #E8DDD0;border-radius:3px;cursor:pointer;">'
+    +'<input type="text" id="vcolortext-'+idx+'" placeholder="#8A7A65 (leave blank if not a color)" value="'+(v.color||'')+'" style="flex:1;padding:.45rem .75rem;border:1px solid #E8DDD0;border-radius:3px;font-size:.85rem;font-family:Arial,sans-serif;">'
+    +'</div></div>'
+    +'</div>'
+    +'<div class="field"><label>Photo URLs (one per line)</label>'
+    +'<textarea id="vimages-'+idx+'" placeholder="Paste image URLs here, one per line" style="min-height:60px;font-size:.8rem;">'+(v.images||[]).join('\n')+'</textarea>'
+    +'</div>';
+  list.appendChild(row);
+}
+
+function removeVariantRow(idx){
+  const row=document.getElementById('variant-row-'+idx);
+  if(row)row.remove();
+  variantRows[idx]=null;
+}
+
+function getVariantsData(){
+  const typeEl=document.getElementById('p-variant-type');
+  const type=typeEl?typeEl.value.trim():'';
+  const variants=[];
+  variantRows.forEach((v,i)=>{
+    const nameEl=document.getElementById('vname-'+i);
+    if(!nameEl)return;
+    const name=nameEl.value.trim();
+    if(!name)return;
+    const price=document.getElementById('vprice-'+i).value;
+    const stock=document.getElementById('vstock-'+i).value;
+    const color=document.getElementById('vcolortext-'+i).value.trim();
+    const imagesRaw=document.getElementById('vimages-'+i).value.trim();
+    const images=imagesRaw?imagesRaw.split('\n').map(u=>u.trim()).filter(Boolean):[];
+    variants.push({type:type,name:name,price:price?parseFloat(price):null,stock:stock?parseInt(stock):null,color:color||null,images:images});
+  });
+  return variants;
+}
+
+function resetVariants(){
+  variantRows=[];
+  const list=document.getElementById('variants-list');
+  if(list)list.innerHTML='';
+  const typeEl=document.getElementById('p-variant-type');
+  if(typeEl)typeEl.value='';
+}
+
+function loadVariantsForEdit(p){
+  resetVariants();
+  if(!p.variants)return;
+  try{
+    const variants=typeof p.variants==='string'?JSON.parse(p.variants):p.variants;
+    if(!Array.isArray(variants)||variants.length===0)return;
+    if(variants[0].type)document.getElementById('p-variant-type').value=variants[0].type;
+    variants.forEach(v=>addVariantRow(v));
+  }catch(e){console.log('Could not load variants:',e);}
+}
+
 document.addEventListener('click',(e)=>{
   if(e.target.id==='fulfill-modal')closeFulfillModal();
   if(e.target.id==='settings-modal')closeSettings();
