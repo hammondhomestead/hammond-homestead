@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — Hammond Homestead</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .product-page { padding: 3rem 0; }
+    .product-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+    @media (max-width: 768px) { .product-layout { grid-template-columns: 1fr; gap: 1.5rem; } }
+    .product-gallery { position: sticky; top: 100px; }
+    .product-main-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 0.5px solid #E8DDD0; background: #F2EBE0; display: flex; align-items: center; justify-content: center; font-size: 4rem; overflow: hidden; transition: opacity 0.2s; }
+    .product-main-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .product-thumbs { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+    .product-thumb { width: 72px; height: 72px; border-radius: 4px; border: 2px solid #E8DDD0; cursor: pointer; overflow: hidden; transition: border-color 0.2s; background: #F2EBE0; flex-shrink: 0; }
+    .product-thumb:hover, .product-thumb.active { border-color: #8A7A65; }
+    .product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .product-info { padding-top: 0.5rem; }
+    .product-category-tag { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7A65; font-family: Arial, sans-serif; margin-bottom: 0.75rem; }
+    .product-title { font-family: Georgia, serif; font-size: 2rem; color: #1A1710; margin-bottom: 0.5rem; line-height: 1.2; }
+    .product-price { font-size: 1.5rem; font-weight: 700; color: #5C4E3C; font-family: Arial, sans-serif; margin-bottom: 1.25rem; }
+    .product-desc { font-size: 0.925rem; color: #7A6A58; font-family: Arial, sans-serif; line-height: 1.75; margin-bottom: 1.5rem; }
+    .variant-section { margin-bottom: 1.5rem; }
+    .variant-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #2A1A0A; font-family: Arial, sans-serif; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+    .variant-selected { font-weight: 400; color: #8A7A65; text-transform: none; letter-spacing: 0; }
+    .variant-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .variant-btn { padding: 8px 16px; border: 1.5px solid #E8DDD0; border-radius: 4px; font-size: 0.85rem; font-family: Arial, sans-serif; cursor: pointer; background: #fff; color: #2A1A0A; transition: all 0.2s; }
+    .variant-btn:hover { border-color: #8A7A65; }
+    .variant-btn.active { border-color: #1A1710; background: #1A1710; color: #FAF6EE; }
+    .variant-btn.out-of-stock { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+    .variant-swatch { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #E8DDD0; cursor: pointer; transition: all 0.2s; }
+    .variant-swatch:hover { transform: scale(1.1); }
+    .variant-swatch.active { border-color: #1A1710; box-shadow: 0 0 0 2px #FAF6EE, 0 0 0 4px #1A1710; }
+    .stock-info { font-size: 0.82rem; font-family: Arial, sans-serif; margin-bottom: 1.25rem; padding: 0.5rem 0.75rem; border-radius: 4px; }
+    .stock-low { background: #fff3cd; color: #856404; }
+    .stock-out { background: #fdecea; color: #C0392B; }
+    .stock-ok { color: #27AE60; }
+    .product-actions { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; }
+    .qty-control { display: flex; align-items: center; border: 1px solid #E8DDD0; border-radius: 4px; overflow: hidden; }
+    .qty-btn { width: 36px; height: 44px; background: #F2EBE0; border: none; font-size: 1.1rem; cursor: pointer; color: #5C4E3C; transition: background 0.2s; }
+    .qty-btn:hover { background: #E8DDD0; }
+    .qty-num { width: 44px; text-align: center; font-size: 0.95rem; font-family: Arial, sans-serif; font-weight: 700; color: #2A1A0A; border: none; outline: none; background: #fff; }
+    .product-atc { flex: 1; padding: 12px 24px; background: #1A1710; color: #FAF6EE; border: none; border-radius: 4px; font-size: 0.9rem; font-weight: 700; font-family: Arial, sans-serif; letter-spacing: 0.08em; cursor: pointer; transition: background 0.2s; }
+    .product-atc:hover { background: #2A2010; }
+    .product-atc:disabled { opacity: 0.4; cursor: not-allowed; }
+    .product-meta { border-top: 1px solid #E8DDD0; padding-top: 1.25rem; font-size: 0.82rem; font-family: Arial, sans-serif; color: #7A6A58; line-height: 1.8; }
+    .product-meta strong { color: #2A1A0A; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: #8A7A65; font-family: Arial, sans-serif; text-decoration: none; margin-bottom: 1.5rem; }
+    .back-link:hover { color: #1A1710; }
+  </style>
+</head>
+<body>
+
+<div class="announcement-bar">Free shipping on orders over $50 · Handmade in Nashville, MI</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-ring"><span>HH</span></div>
+      <div class="header-logo-text">Hammond Homestead<small>Hustle &amp; Motivation Makes Our Next Dream</small></div>
+    </a>
+    <nav class="header-nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="story.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cart-count" style="display:none;">0</span></button>
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a><a href="shop.html">Shop</a><a href="story.html">Our Story</a><a href="contact.html">Contact</a>
+  </div>
+</header>
+
+<div class="product-page">
+  <div class="container">
+    <a href="shop.html" class="back-link">← Back to Shop</a>
+    <div id="product-loading" style="text-align:center;padding:4rem;color:#7A6A58;font-family:Arial,sans-serif;">Loading product...</div>
+    <div id="product-content" class="product-layout" style="display:none;">
+      <div class="product-gallery">
+        <div class="product-main-img" id="main-image-wrap">
+          <img id="main-image" src="" alt="" style="display:none;">
+          <span id="main-placeholder">🛍️</span>
+        </div>
+        <div class="product-thumbs" id="product-thumbs"></div>
+      </div>
+      <div class="product-info">
+        <div class="product-category-tag" id="product-category"></div>
+        <h1 class="product-title" id="product-name">Loading...</h1>
+        <div class="product-price" id="product-price">$0.00</div>
+        <div class="product-desc" id="product-desc"></div>
+        <div id="variants-section" class="variant-section" style="display:none;">
+          <div class="variant-label">
+            <span id="variant-type-label">Options</span>
+            <span class="variant-selected" id="variant-selected-name"></span>
+          </div>
+          <div class="variant-options" id="variant-options"></div>
+        </div>
+        <div id="stock-info" class="stock-info" style="display:none;"></div>
+        <div class="product-actions">
+          <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input type="number" class="qty-num" id="qty-input" value="1" min="1" max="99" readonly>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+          <button class="product-atc" id="atc-btn" onclick="addProductToCart()">Add to Cart</button>
+        </div>
+        <div class="product-meta" id="product-meta"></div>
+      </div>
+    </div>
+    <div id="product-not-found" style="display:none;text-align:center;padding:4rem;">
+      <div style="font-size:3rem;margin-bottom:1rem;">🌾</div>
+      <h2 style="font-family:Georgia,serif;color:#1A1710;margin-bottom:0.5rem;">Product not found</h2>
+      <p style="color:#7A6A58;font-family:Arial,sans-serif;margin-bottom:1.5rem;">This product may no longer be available.</p>
+      <a href="shop.html" class="btn btn-primary">Back to Shop</a>
+    </div>
+  </div>
+</div>
+
+<div class="cart-overlay" id="cart-overlay"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-drawer-header"><h3>Your Cart</h3><button class="cart-close" onclick="closeCart()">✕</button></div>
+  <div class="cart-items" id="cart-items"><div class="cart-empty" id="cart-empty">Your cart is empty.</div></div>
+  <div class="cart-footer hidden" id="cart-footer">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+    <a href="checkout.html" class="btn btn-primary btn-full">Checkout →</a>
+    <button onclick="closeCart()" class="btn btn-outline btn-full mt-1">Continue Shopping</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col"><h4>Hammond Homestead</h4><p>Handmade goods crafted with hustle and heart from Nashville, Michigan.</p></div>
+    <div class="footer-col" id="footer-social-col"></div>
+    <div class="footer-col"><h4>Shop</h4><a href="shop.html">All Products</a><a href="shop.html">Gift Sets</a></div>
+    <div class="footer-col"><h4>Info</h4><a href="story.html">Our Story</a><a href="contact.html">Contact Us</a></div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-slogan">"Hustle and Motivation Makes Our Next Dream"</p>
+    <p class="footer-copy">© 2026 Hammond Homestead · All rights reserved</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+<script src="js/enhancements.js"></script>
+<script src="js/footer-social.js"></script>
+<script src="js/custom-order.js"></script>
+<script>
+let product = null, selectedVariant = null, qty = 1;
+
+async function loadProduct() {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) { showNotFound(); return; }
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/products?id=eq.' + id + '&select=*', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const data = await res.json();
+    if (!data || data.length === 0) { showNotFound(); return; }
+    product = data[0];
+    document.title = product.name + ' — Hammond Homestead';
+    renderProduct();
+  } catch(err) { showNotFound(); }
+}
+
+function showNotFound() {
+  document.getElementById('product-loading').style.display = 'none';
+  document.getElementById('product-not-found').style.display = 'block';
+}
+
+function renderProduct() {
+  document.getElementById('product-loading').style.display = 'none';
+  document.getElementById('product-content').style.display = 'grid';
+  document.getElementById('product-name').textContent = product.name;
+  document.getElementById('product-desc').textContent = product.description || '';
+  if (product.category) document.getElementById('product-category').textContent = product.category;
+  const variants = parseVariants(product.variants);
+  if (variants.length > 0) { renderVariants(variants); selectVariant(variants[0], 0); }
+  else { setPrice(product.price); setMainImage(product.image_url); setStock(product.stock); renderMeta(null); }
+}
+
+function parseVariants(raw) {
+  if (!raw) return [];
+  try { return typeof raw === 'string' ? JSON.parse(raw) : Array.isArray(raw) ? raw : []; }
+  catch(e) { return []; }
+}
+
+function renderVariants(variants) {
+  document.getElementById('variants-section').style.display = 'block';
+  const first = variants[0];
+  document.getElementById('variant-type-label').textContent = (first.type || 'Option') + ':';
+  document.getElementById('variant-options').innerHTML = variants.map((v, i) => {
+    const oos = v.stock !== null && v.stock !== undefined && parseInt(v.stock) <= 0;
+    if (v.color) {
+      return `<div class="variant-swatch ${oos ? 'out-of-stock' : ''}" style="background:${v.color};" title="${v.name}" onclick="${oos ? '' : 'selectVariant(parseVariants(product.variants)[' + i + '], ' + i + ')'}" id="variant-${i}"></div>`;
+    }
+    return `<button class="variant-btn ${oos ? 'out-of-stock' : ''}" onclick="${oos ? '' : 'selectVariant(parseVariants(product.variants)[' + i + '], ' + i + ')'}" id="variant-${i}">${v.name}${v.price ? ' — $' + parseFloat(v.price).toFixed(2) : ''}</button>`;
+  }).join('');
+}
+
+function selectVariant(variant, index) {
+  selectedVariant = variant;
+  document.querySelectorAll('.variant-btn, .variant-swatch').forEach(el => el.classList.remove('active'));
+  if (index !== undefined) { const el = document.getElementById('variant-' + index); if (el) el.classList.add('active'); }
+  document.getElementById('variant-selected-name').textContent = variant.name;
+  setPrice(variant.price || product.price);
+  const imgs = variant.images?.length > 0 ? variant.images : variant.image ? [variant.image] : product.image_url ? [product.image_url] : [];
+  setMainImage(imgs[0] || null);
+  renderThumbs(imgs);
+  setStock(variant.stock !== null && variant.stock !== undefined ? variant.stock : product.stock);
+  renderMeta(variant);
+}
+
+function setMainImage(url) {
+  const img = document.getElementById('main-image');
+  const ph = document.getElementById('main-placeholder');
+  if (url) { img.src = url; img.style.display = 'block'; ph.style.display = 'none'; }
+  else { img.style.display = 'none'; ph.style.display = 'block'; }
+}
+
+function renderThumbs(images) {
+  const el = document.getElementById('product-thumbs');
+  if (!images || images.length <= 1) { el.innerHTML = ''; return; }
+  el.innerHTML = images.map((url, i) =>
+    `<div class="product-thumb ${i===0?'active':''}" onclick="switchImage('${url}', this)"><img src="${url}" alt="View ${i+1}"></div>`
+  ).join('');
+}
+
+function switchImage(url, thumb) {
+  setMainImage(url);
+  document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+  const wrap = document.getElementById('main-image-wrap');
+  wrap.style.opacity = '0.7';
+  setTimeout(() => wrap.style.opacity = '1', 150);
+}
+
+function setPrice(price) {
+  document.getElementById('product-price').textContent = '$' + parseFloat(price).toFixed(2);
+}
+
+function setStock(stock) {
+  const el = document.getElementById('stock-info');
+  const btn = document.getElementById('atc-btn');
+  const s = stock !== null && stock !== undefined ? parseInt(stock) : null;
+  if (s === null) { el.style.display = 'none'; btn.disabled = false; btn.textContent = 'Add to Cart'; return; }
+  el.style.display = 'block';
+  if (s <= 0) { el.className = 'stock-info stock-out'; el.textContent = '✕ Out of stock'; btn.disabled = true; btn.textContent = 'Out of Stock'; }
+  else if (s <= 5) { el.className = 'stock-info stock-low'; el.textContent = '⚡ Only ' + s + ' left!'; btn.disabled = false; btn.textContent = 'Add to Cart'; }
+  else { el.className = 'stock-info stock-ok'; el.textContent = '✓ In stock'; btn.disabled = false; btn.textContent = 'Add to Cart'; }
+}
+
+function renderMeta(variant) {
+  const shipping = parseFloat(variant?.shipping_cost || product.shipping_cost || 0);
+  const lines = [];
+  if (product.category) lines.push('<strong>Category:</strong> ' + product.category);
+  lines.push('<strong>Shipping:</strong> ' + (shipping > 0 ? '$' + shipping.toFixed(2) : 'Free'));
+  lines.push('<strong>Made in:</strong> Nashville, Michigan');
+  document.getElementById('product-meta').innerHTML = lines.join('<br>');
+}
+
+function changeQty(delta) { qty = Math.max(1, qty + delta); document.getElementById('qty-input').value = qty; }
+
+function addProductToCart() {
+  if (!product) return;
+  const price = selectedVariant?.price || product.price;
+  const name = selectedVariant ? product.name + ' — ' + selectedVariant.name : product.name;
+  const image = selectedVariant?.images?.[0] || selectedVariant?.image || product.image_url || '';
+  const shipping = parseFloat(selectedVariant?.shipping_cost || product.shipping_cost || 0);
+  for (let i = 0; i < qty; i++) {
+    addToCart({ id: product.id + (selectedVariant ? '-' + selectedVariant.name : ''), name, price: parseFloat(price), image, shipping_cost: shipping });
+  }
+}
+
+loadProduct();
+</script>
+</body>
+</html>
