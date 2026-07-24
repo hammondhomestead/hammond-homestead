@@ -409,8 +409,10 @@ function initScrollReveal() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initPageTransitions();
-  initBackToTop();
-  initImageZoom();
+  // Only enable zoom on the product detail page
+  if (window.location.pathname.includes('product.html')) {
+    initImageZoom();
+  }
   initParallax();
   initScrollReveal();
 
