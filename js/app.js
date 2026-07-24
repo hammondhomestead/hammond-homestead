@@ -191,10 +191,13 @@ function buildProductCard(p) {
     : '<button class="btn btn-dark btn-sm" onclick="trackRecentlyViewed({id:\'' + safeId + '\',name:\'' + safeName + '\',price:' + safePrice + ',image:\'' + safeImage + '\'});addToCart({id:\'' + safeId + '\',name:\'' + safeName + '\',price:' + safePrice + ',image:\'' + safeImage + '\',shipping_cost:' + safeShipping + '})">Add to Cart</button>';
 
   return '<div class="product-card" data-id="' + safeId + '">'
+    + '<a href="product.html?id=' + safeId + '" style="text-decoration:none;color:inherit;display:block;">'
     + '<div class="product-card-img">' + imgHtml + badgeHtml + '</div>'
-    + '<div class="product-card-body">'
+    + '<div class="product-card-body" style="padding-bottom:0;">'
     + '<div class="product-card-name">' + p.name + '</div>'
     + '<div class="product-card-desc">' + (p.description || '') + '</div>'
+    + '</div></a>'
+    + '<div class="product-card-body" style="padding-top:0;">'
     + '<div class="product-card-footer">'
     + '<div class="product-card-price">$' + safePrice.toFixed(2) + '</div>'
     + addBtn
