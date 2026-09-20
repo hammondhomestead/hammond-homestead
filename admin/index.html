@@ -221,7 +221,7 @@
         </div>
         <div style="overflow-x:auto;">
           <table class="orders-table">
-            <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <thead><tr><th>Order #</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
             <tbody id="orders-body"><tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#7A6A58;">No orders yet.</td></tr></tbody>
           </table>
         </div>
@@ -800,6 +800,7 @@ function renderOrders(){
     return'<tr>'
       +'<td>#'+orderId+'</td>'
       +'<td>'+(o.customer_name||'—')+'<br><span style="font-size:.75rem;color:#7A6A58;">'+(o.customer_email||'')+'</span></td>'
+      +'<td style="font-size:.78rem;color:#7A6A58;max-width:160px;">'+(o.address||'—')+'</td>'
       +'<td style="font-size:.8rem;max-width:180px;">'+items+'</td>'
       +'<td>$'+parseFloat(o.total||0).toFixed(2)+'</td>'
       +'<td><span class="order-status status-'+(o.status||'pending')+'">'+(o.status||'pending')+'</span>'
