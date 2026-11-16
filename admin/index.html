@@ -858,7 +858,7 @@ async function fulfillOrder(){
     });
     if(!res.ok)throw new Error('Failed to update order');
     if(sendEmail&&email){
-      const resendKey='re_bmgAViME_Eafk2xBqKNbRrQXw1Pu434AK';
+      const resendKey=true; // key lives in Supabase secrets; email sent by webhook
       const storeEmail=localStorage.getItem('hh_store_email')||'shipping@hammond-homestead.com';
       console.log('Resend key: HARDCODED');
       console.log('Store email:', storeEmail);
