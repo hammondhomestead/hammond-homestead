@@ -454,15 +454,14 @@ async function saveCustomOrder(data) {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_KEY,
         'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Prefer': 'return=representation'
+        'Prefer': 'return=minimal'
       },
       body: JSON.stringify(data)
     });
-    const resData = await res.json();
     if (!res.ok) {
-      console.error('Custom order save failed:', JSON.stringify(resData));
+      console.error('Custom order save failed:', await res.text());
     } else {
-      console.log('Custom order saved OK:', JSON.stringify(resData));
+      console.log('Custom order saved OK');
     }
   } catch(err) {
     console.error('Supabase error:', err);
